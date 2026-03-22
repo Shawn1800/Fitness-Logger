@@ -9,4 +9,4 @@ import com.example.demo103.data.entity.ExerciseEntity
 //    ExerciseEntity(exerciseName = "Overhead Press",category="shoulders"),
 //    ExerciseEntity(exerciseName = "Pull Ups",category="back"),
 //    ExerciseEntity(exerciseName = "Dumbell Press",category="chest"),
-//    ExerciseEntity(exerciseName = "Bicep Curls",category="backs"))
+//   ExerciseEntity(exerciseName = "Bicep Curls",category="backs"))

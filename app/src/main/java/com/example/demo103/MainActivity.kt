@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.setSelectedDate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -65,7 +66,7 @@ fun MainNavigation() {
     )
 
     val exerciseViewModel: ExerciseViewModel = viewModel(
-        factory = ExerciseViewModelFactory(exerciseRepository)
+        factory = ExerciseViewModelFactory(exerciseRepository, workoutRepository)
     )
 
     val logWorkoutViewModel: LogWorkoutViewModel= viewModel(
@@ -85,7 +86,13 @@ fun MainNavigation() {
             entry<Route.HomeScreen>{
                     HomeScreen(
                         homeViewModel = homeViewModel,
+                        onNavigateToLogWorkout = { exercise ->
+                            val date = homeViewModel.state.value.selectedDateMillis ?: System.currentTimeMillis()
+                            backStack.add(Route.LogWorkoutScreen(exercise,date))  // pass exercise
+                        },
                         onNavigateToExerciseSelection = {
+                            val selectedDate = homeViewModel.state.value.selectedDateMillis
+                            exerciseViewModel.setSelectedDate(selectedDate ?:System.currentTimeMillis())
                             backStack.add(Route.ExerciseScreen)
                         }
                     )
@@ -95,7 +102,8 @@ fun MainNavigation() {
                 ExerciseSelectionScreen(
                     viewModel = exerciseViewModel,
                     onNavigateToLogWorkout = { exercise ->
-                        backStack.add(Route.LogWorkoutScreen(exercise))  // pass exercise
+                        val date = homeViewModel.state.value.selectedDateMillis ?: System.currentTimeMillis()
+                        backStack.add(Route.LogWorkoutScreen(exercise,date))  // pass exercise
                     } ,
                     onBack = { backStack.removeLastOrNull() },
                 )
@@ -104,6 +112,7 @@ fun MainNavigation() {
             entry<Route.LogWorkoutScreen> { entry ->
                 LogWorkoutScreen(
                     exercise = entry.exercise,
+                    dateMillis = entry.dateMillis,
                     logWorkoutViewModel = logWorkoutViewModel,
                     onBack = {
                         backStack.removeAll { it !is Route.HomeScreen }

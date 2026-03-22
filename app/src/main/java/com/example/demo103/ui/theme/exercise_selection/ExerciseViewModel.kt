@@ -3,7 +3,7 @@ package com.example.demo103.ui.theme.exercise_selection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.demo103.data.repository.ExerciseRepository
-import com.example.demo103.ui.theme.log_workout.LogWorkoutUiEvent
+import com.example.demo103.data.repository.WorkoutRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -20,7 +21,8 @@ import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
 class ExerciseViewModel(
-    private val repository : ExerciseRepository
+    private val repository : ExerciseRepository,
+    private val workoutRepository: WorkoutRepository
 ): ViewModel() {
     //------------------------------------------------------------------------------------------//
     // we don't use this here as we let the pipeline handle search and category selection
@@ -35,6 +37,11 @@ class ExerciseViewModel(
     private val _uiEvent = MutableSharedFlow<ExerciseUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
+    private var selectedDateMillis: Long = System.currentTimeMillis()
+
+    fun setSelectedDate(millis: Long) {
+        selectedDateMillis = millis
+    }
 
     // ── UI State ──────────────────────────────────────────────────────────
 
@@ -87,11 +94,20 @@ class ExerciseViewModel(
                 _selectedCategory.value = null //value of the state becomes null
             }
 //             when i press onclick this runs
-            is ExerciseEvent.OnAddExercise-> {
+            is ExerciseEvent.OnAddExercise -> {
                 viewModelScope.launch {
-                    _uiEvent.emit(
-                        ExerciseUiEvent.AddExercise(exercise = event.exercise)
-                    )
+                    // Query the DB for entries matching this exercise and the selected day
+                    val existingEntries = workoutRepository
+                        .getWorkoutByExerciseAndDate(event.exercise.exerciseId, selectedDateMillis)
+                        .first() // Get the current snapshot from the Flow
+
+                    if (existingEntries.isNotEmpty()) {
+                        // If it exists, send a message to the UI
+                        _uiEvent.emit(ExerciseUiEvent.SendSnackbar("${event.exercise.exerciseName} is already added for today"))
+                    } else {
+                        // Otherwise, proceed with navigation
+                        _uiEvent.emit(ExerciseUiEvent.AddExercise(exercise = event.exercise))
+                    }
                 }
             }
 

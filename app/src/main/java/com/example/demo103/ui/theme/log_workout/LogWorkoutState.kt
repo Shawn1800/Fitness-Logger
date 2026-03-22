@@ -10,5 +10,8 @@ data class LogWorkoutState (
    val selectedExerciseId:Int?=null,
 //   val isLoading: Boolean=false,
    val sets:List<WorkoutEntryEntity> = emptyList(),
-   val exercise : ExerciseEntity? = null
+   val exercise : ExerciseEntity? = null,
+   val editingWeights: Map<Int, String> = emptyMap(),
+   val editingReps: Map<Int, String> = emptyMap(),
+   val dateMillis : Long = 0L
 )

@@ -9,6 +9,6 @@ data class HomeState (
     val selectedDateMillis: Long? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val workouts: List<WorkoutWithExercise> = emptyList(),
+    val workouts: List<GroupedWorkout> = emptyList(),
 
-)
+    )

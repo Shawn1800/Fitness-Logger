@@ -1,124 +1,159 @@
 package com.example.demo103.ui.theme.log_workout
 
-import android.annotation.SuppressLint
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.demo103.data.entity.WorkoutEntryEntity
 import com.example.demo103.data.repository.WorkoutRepository
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
 
 class LogWorkoutViewModel (
     private val repository: WorkoutRepository
 ) : ViewModel(){
     private val _state = MutableStateFlow(LogWorkoutState())
     val state: StateFlow<LogWorkoutState> = _state.asStateFlow()
-
     private val _uiEvent = MutableSharedFlow<LogWorkoutUiEvent>()
     val uiEvent:  SharedFlow<LogWorkoutUiEvent> = _uiEvent.asSharedFlow()
 
-
-
-
-    fun onEvent(event: LogWorkoutEvent){
-        when(event){
-
+    fun onEvent(event: LogWorkoutEvent) {
+        when (event) {
             is LogWorkoutEvent.OnAddingSets -> {
-                viewModelScope.launch {  //coroutine is stopped when the viewmodel is cleared
+                // 1. Get current input values
+                val weight = _state.value.currentWeight.toDoubleOrNull()
+                val reps = _state.value.currentReps.toIntOrNull()
 
-                    val weight = _state.value.currentWeight.toDoubleOrNull() //it convert the string into double if valid double if not return null
-                    val reps = _state.value.currentReps.toIntOrNull()
-
-                    if (weight == null|| reps == null ){
-                        _uiEvent.emit(LogWorkoutUiEvent.SendSnackbar("invalid input"))
-                        //emit error
-                        return@launch // stop the current coroutine  and return to the caller
+                if (weight == null || reps == null ||weight ==0.0 || reps==0) {
+                    viewModelScope.launch {
+                        _uiEvent.emit(LogWorkoutUiEvent.SendSnackbar("Enter valid weight and reps"))
                     }
+                    return
+                }
 
-                    //create new set
-                  val newEntry= WorkoutEntryEntity(
-                      exerciseId = _state.value.exercise?.exerciseId ?: return@launch,
+                // 2. Add to list and RESET inputs
+                _state.update { currentState ->
+                    currentState.copy(
+                        currentWeight = "",
+                        currentReps = "",
+                        sets = currentState.sets + WorkoutEntryEntity(
+                            entryId = -(currentState.sets.size + 1), // Temporary ID to distinguish unsaved sets
+                            exerciseId = event.exerciseId,
                             weight = weight,
                             reps = reps,
-                            sets = _state.value.sets.size + 1,
+                            sets = currentState.sets.size + 1,
                             date = System.currentTimeMillis()
                         )
-                    // save the set to  db
-                    repository.insertWorkoutEntry(newEntry)
-
-                    _state.update {currentState-> //update the state
-                        currentState.copy(  //do change only the sets and weight  and keep the rest of the state same
-                            currentWeight = "", //reset the weight and reps after adding the set
-                            currentReps="",
-//                            sets=currentState.sets+newEntry // add the new set to the list of sets in the state (we can use + operator to add an element to a list and it will return a new list with the added element
-                        )
-                    }
+                    )
                 }
             }
 
             is LogWorkoutEvent.DeleteSet -> {
                 viewModelScope.launch {
-                    repository.deleteSetById(event.entryId)
-
-                    _state.update { currentState->
-                        currentState.copy(
-                            sets=currentState.sets.filter { it.entryId != event.entryId  }
-                        )
-
+                    if (event.entryId > 0) {
+                        repository.deleteSetById(event.entryId)
                     }
+                    _state.update { currentState ->
+                        currentState.copy(
+                            sets = currentState.sets.filter { it.entryId != event.entryId })
                     }
                 }
-           // viewmodelscope is not used here as it does not need ot touch the db
+            }
+
             is LogWorkoutEvent.UpdateReps -> {
-                _state.update { currentState ->
-                    currentState.copy(
-                        currentWeight = event.reps
-                    )
+                if (event.entryId == 0) {
+                    _state.update { it.copy(currentReps = event.reps) }
+                } else {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            editingReps = currentState.editingReps + (event.entryId to event.reps),
+                            sets = currentState.sets.map {
+                                if (it.entryId == event.entryId) {
+                                    // Only update the number if the input is valid
+                                    it.copy(reps = event.reps.toIntOrNull() ?: it.reps)
+                                } else it
+                            })
+                    }
                 }
             }
 
             is LogWorkoutEvent.UpdateWeight -> {
-                _state.update{currentState->
-                    currentState.copy(
-                        currentWeight = event.weight
-                    )
+                if (event.entryId == 0) {
+                    _state.update { it.copy(currentWeight = event.weight) }
+                } else {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            editingWeights = currentState.editingWeights + (event.entryId to event.weight),
+                            sets = currentState.sets.map {
+                                if (it.entryId == event.entryId) {
+                                    it.copy(weight = event.weight.toDoubleOrNull() ?: it.weight)
+                                } else it
+                            })
+                    }
                 }
             }
 
+            // When loading sets, initialize the maps
             is LogWorkoutEvent.SetExercise -> {
-                _state.update {
-                    it.copy(exercise = event.exercise) } // it here is the LogWorkoutState and we are copying the state and updating only the exercise field with the new exercise passed in the event
+                _state.update { it.copy (exercise = event.exercise, dateMillis = event.dateMillis )}
+                viewModelScope.launch {
+                    repository.getWorkoutByExerciseAndDate(event.exercise.exerciseId,event.dateMillis).first()
+                        .let { list ->
+                        _state.update {
+                            it.copy(
+                                sets = list,
+                                editingWeights = list.associate { it.entryId to it.weight.toString() },
+                                editingReps = list.associate { it.entryId to it.reps.toString() })
+                        }
+                    }
+                }
             }
 
-          //since we already saving data to db with each set we dont need to save data to db again here
-            is LogWorkoutEvent.SaveWorkout->{
+            is LogWorkoutEvent.SaveWorkout -> {
                 viewModelScope.launch {
-                    if (_state.value.sets.isEmpty()){
-                        _uiEvent.emit(LogWorkoutUiEvent.SendSnackbar("Atleast add 1 set"))
-                         return@launch
+                    val dateToSave =
+                        _state.value.dateMillis
+
+                    val currentState = _state.value
+                    var allSets = currentState.sets
+// 2. IMPORTANT: If there is valid text in the current input fields, include it!
+                    val curWeight = currentState.currentWeight.toDoubleOrNull()
+                    val curReps = currentState.currentReps.toIntOrNull()
+                    if (curWeight != null && curReps != null && curWeight > 0 && curReps > 0) {
+                        allSets = allSets + WorkoutEntryEntity(
+                            exerciseId = currentState.exercise?.exerciseId ?: 0,
+                            weight = curWeight,
+                            reps = curReps,
+                            sets = allSets.size + 1,
+                            date = dateToSave
+                        )
                     }
-                   else{
-                       _uiEvent.emit(LogWorkoutUiEvent.NavBackToHome)
+                    if (allSets.isEmpty()) {
+                        _uiEvent.emit(LogWorkoutUiEvent.SendSnackbar("Add at least 1 set"))
+                        return@launch
+                    }
+// 3. Fix: Use normalized date and handle IDs for Room
+                    val finalizedSets = allSets.map {
+                        it.copy(
+                            entryId = if (it.entryId < 0) 0 else it.entryId,
+                            date = dateToSave // This ensures it matches the Home screen query
+                        )
+                    }
+                    try {
+                        repository.insertWorkoutEntry(finalizedSets) // Use the finalized list!
+                        _uiEvent.emit(LogWorkoutUiEvent.NavBackToHome)
+                    } catch (e: Exception) {
+                        _uiEvent.emit(LogWorkoutUiEvent.SendSnackbar("Error saving: ${e.message}"))
                     }
                 }
             }
         }
     }
-
-
-
-
-
-
-
-
 }

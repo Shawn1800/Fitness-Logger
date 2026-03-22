@@ -32,7 +32,8 @@ abstract class ExerciseDatabase : RoomDatabase() {
             ExerciseEntity(exerciseName = "Overhead Press", category = "shoulders"),
             ExerciseEntity(exerciseName = "Pull Ups", category = "back"),
             ExerciseEntity(exerciseName = "Dumbbell Press", category = "chest"),
-            ExerciseEntity(exerciseName = "Bicep Curls", category = "arms")
+            ExerciseEntity(exerciseName = "Bicep Curls", category = "arms"),
+            ExerciseEntity(exerciseName = "Preacher Curls", category = "arms")
         )
         fun getInstance(context: Context): ExerciseDatabase {
             return INSTANCE ?: synchronized(this) {

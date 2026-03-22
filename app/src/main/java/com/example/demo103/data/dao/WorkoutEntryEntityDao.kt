@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface WorkoutEntryEntityDao{
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertWorkoutEntry(entry: WorkoutEntryEntity) //recheck
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertWorkoutEntry(entry: List<WorkoutEntryEntity>) //recheck
 
     @Transaction
     @Query("SELECT * FROM workout_entry WHERE date = :date")
@@ -23,9 +23,13 @@ interface WorkoutEntryEntityDao{
     @Query("SELECT * FROM workout_entry WHERE exercise_id = :exerciseId")
     fun getWorkoutByExercise(exerciseId: Int): Flow<List<WorkoutEntryEntity>>
 
-//    @Query("DELETE  FROM workout_entry WHERE entryId=:id")
-//    suspend fun deleteEntryById(id:Int)
     @Query("DELETE  FROM workout_entry WHERE entryId = :entryId")
     suspend fun deleteSetById(entryId:Int)
 
+    @Query("SELECT * FROM workout_entry WHERE exercise_id = :exerciseId AND date = :date  ")
+    fun getWorkoutByExerciseAndDate(exerciseId: Int,date: Long) : Flow<List<WorkoutEntryEntity>>
+
+
+    @Query ("DELETE FROM workout_entry WHERE exercise_id = :exerciseId AND date =:date ")
+    suspend fun deleteWorkoutByExerciseAndDate(exerciseId:Int,date:Long )
 }

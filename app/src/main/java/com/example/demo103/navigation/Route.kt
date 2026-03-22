@@ -15,7 +15,6 @@ sealed interface Route : NavKey {
     data object ExerciseScreen : Route , NavKey
 
     @Serializable
-    data class LogWorkoutScreen (val exercise: ExerciseEntity) : Route , NavKey
-
+    data class LogWorkoutScreen (val exercise: ExerciseEntity, val dateMillis: Long) : Route , NavKey
 
 }
