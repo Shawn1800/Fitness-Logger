@@ -10,5 +10,4 @@ data class HomeState (
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val workouts: List<GroupedWorkout> = emptyList(),
-
     )

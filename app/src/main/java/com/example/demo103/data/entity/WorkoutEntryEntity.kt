@@ -10,9 +10,9 @@ import androidx.room.PrimaryKey
 foreignKeys =[
     ForeignKey(
         entity = ExerciseEntity::class,
-        parentColumns = ["exerciseId"],
+        parentColumns = ["exercise_id"],
         childColumns = ["exercise_id"],
-        onDelete = ForeignKey.Companion.CASCADE
+        onDelete = ForeignKey.CASCADE
     )
 ],
 indices=[Index("exercise_id")]

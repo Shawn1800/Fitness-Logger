@@ -27,7 +27,7 @@ interface WorkoutEntryEntityDao{
     suspend fun deleteSetById(entryId:Int)
 
     @Query("SELECT * FROM workout_entry WHERE exercise_id = :exerciseId AND date = :date  ")
-    fun getWorkoutByExerciseAndDate(exerciseId: Int,date: Long) : Flow<List<WorkoutEntryEntity>>
+    suspend fun getWorkoutByExerciseAndDate(exerciseId: Int,date: Long) : List<WorkoutEntryEntity>
 
 
     @Query ("DELETE FROM workout_entry WHERE exercise_id = :exerciseId AND date =:date ")

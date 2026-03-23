@@ -18,12 +18,12 @@ class WorkoutRepository(private val workoutEntryEntityDao: WorkoutEntryEntityDao
         workoutEntryEntityDao. deleteSetById(entryId)
     }
 
-    fun getWorkoutByExerciseAndDate (exerciseId: Int, date:Long ) : Flow<List<WorkoutEntryEntity>> {
+    suspend fun getWorkoutByExerciseAndDate (exerciseId: Int, date:Long ) : List<WorkoutEntryEntity> {
         return workoutEntryEntityDao.getWorkoutByExerciseAndDate(exerciseId,date)
     }
 
-    suspend fun  deleteWorkoutByExerciseAndDate(exerciseId: Int,date: Long) {
-        workoutEntryEntityDao.deleteWorkoutByExerciseAndDate(exerciseId,date)
-    }
+//    suspend fun  deleteWorkoutByExerciseAndDate(exerciseId: Int,date: Long) {
+//        workoutEntryEntityDao.deleteWorkoutByExerciseAndDate(exerciseId,date)
+//    }
 
 }

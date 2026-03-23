@@ -99,7 +99,7 @@ class ExerciseViewModel(
                     // Query the DB for entries matching this exercise and the selected day
                     val existingEntries = workoutRepository
                         .getWorkoutByExerciseAndDate(event.exercise.exerciseId, selectedDateMillis)
-                        .first() // Get the current snapshot from the Flow
+                      // Get the current snapshot from the Flow
 
                     if (existingEntries.isNotEmpty()) {
                         // If it exists, send a message to the UI
@@ -110,12 +110,6 @@ class ExerciseViewModel(
                     }
                 }
             }
-
-//            is ExerciseEvent.OnExerciseSelected->{
-//                viewModelScope.launch {
-//                    _uiEvent.emit(ExerciseUiEvent.ExerciseSelected(exercise = event.exercise))
-//                }
-//            }
 
         }
     }

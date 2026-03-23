@@ -2,23 +2,30 @@ package com.example.demo103.ui.theme.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.demo103.data.UseCase.OneRepMaxUseCase
 import com.example.demo103.data.entity.ExerciseEntity
 import com.example.demo103.data.entity.WorkoutEntryEntity
+import com.example.demo103.data.repository.OneRepMaxRepository
 import com.example.demo103.data.repository.WorkoutRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.ZoneId
 
 data class GroupedWorkout(
     val exercise: ExerciseEntity,
-    val sets: List<WorkoutEntryEntity>
+    val sets: List<WorkoutEntryEntity>,
+    val changePercent:Double? =null
 )
 class HomeViewModel(
-    private val repository: WorkoutRepository
-) : ViewModel() {
+    private val repository: WorkoutRepository,
+    private val oneRepMaxRepository: OneRepMaxRepository,
+    private val oneRepMaxUseCase : OneRepMaxUseCase
 
+) : ViewModel() {
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
@@ -58,31 +65,32 @@ class HomeViewModel(
                      _uiEvent.emit(HomeUiEvent.NavigateToLogWorkout(event.exercise))
                  }
              }
-
-//            is HomeEvent.OnDeleteWorkout->{
-//                viewModelScope.launch {
-//                     repository.
-//                }
-//            }
-
         }
     }
 
     private fun observeWorkoutsForDate(dateMillis: Long) {
         workoutJob?.cancel()
         workoutJob = viewModelScope.launch {
-            repository.getWorkoutByDate(dateMillis)
-                .collect { workouts ->
-                    val grouped = workouts
-                        .groupBy { it.exercise.exerciseId }
-                        .map { (_, entries) ->
-                            GroupedWorkout(
-                                exercise = entries.first().exercise,
-                                sets = entries.map { it.workoutEntry }
-                            )
-                        }
-                    _state.update { it.copy(workouts = grouped) }
-                }
+            combine(
+                repository.getWorkoutByDate(dateMillis),
+                oneRepMaxRepository.getOneRepMaxForDate(dateMillis)
+            ) { workouts, oneRepMaxes ->
+                val oneRMMap = oneRepMaxes.associateBy { it.exerciseId }
+                
+                workouts
+                    .groupBy { it.exercise.exerciseId }
+                    .map { (exerciseId, entries) ->
+                        GroupedWorkout(
+                            exercise = entries.first().exercise,
+                            sets = entries.map { it.workoutEntry },
+                            changePercent = oneRMMap[exerciseId]?.changePercent
+                        )
+                    }
+            }
+            .flowOn(Dispatchers.IO)
+            .collect { grouped ->
+                _state.update { it.copy(workouts = grouped) }
+            }
         }
     }
 }

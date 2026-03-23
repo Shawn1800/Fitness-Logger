@@ -1,6 +1,7 @@
 package com.example.demo103.data.db
 
 import android.content.Context
+import androidx.lifecycle.ViewModelProvider.NewInstanceFactory.Companion.instance
 import androidx.room.Room
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.demo103.data.entity.ExerciseEntity
@@ -12,16 +13,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.example.demo103.data.dao.OneRepMaxEntityDao
+import com.example.demo103.data.db.ExerciseDatabase.Companion.defaultExercises
+import com.example.demo103.data.entity.OneRepMaxEntity
 
 @Database(
-    entities = [ExerciseEntity::class, WorkoutEntryEntity::class],
-    version = 2,
+    entities = [ExerciseEntity::class, WorkoutEntryEntity::class, OneRepMaxEntity::class],
+    version = 4,
     exportSchema = false
 )
 
 abstract class ExerciseDatabase : RoomDatabase() {
     abstract fun exerciseDao(): ExerciseDao
     abstract  fun workoutEntryEntityDao(): WorkoutEntryEntityDao
+
+    abstract fun oneRepMaxEntityDao(): OneRepMaxEntityDao
     companion object {
         @Volatile
         private var INSTANCE: ExerciseDatabase? = null

@@ -2,7 +2,9 @@ package com.example.demo103.ui.theme.log_workout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.demo103.data.UseCase.OneRepMaxUseCase
 import com.example.demo103.data.entity.WorkoutEntryEntity
+import com.example.demo103.data.repository.OneRepMaxRepository
 import com.example.demo103.data.repository.WorkoutRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +19,9 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 class LogWorkoutViewModel (
-    private val repository: WorkoutRepository
+    private val repository: WorkoutRepository,
+    private val oneRepMaxRepository: OneRepMaxRepository,
+    private val oneRepMaxUseCase: OneRepMaxUseCase
 ) : ViewModel(){
     private val _state = MutableStateFlow(LogWorkoutState())
     val state: StateFlow<LogWorkoutState> = _state.asStateFlow()
@@ -60,10 +64,25 @@ class LogWorkoutViewModel (
                     if (event.entryId > 0) {
                         repository.deleteSetById(event.entryId)
                     }
+                    val updatedSets = _state.value.sets.filter { it.entryId != event.entryId }
                     _state.update { currentState ->
                         currentState.copy(
-                            sets = currentState.sets.filter { it.entryId != event.entryId })
+                            sets = updatedSets)
                     }
+                    val exerciseId = _state.value.exercise?.exerciseId?: return@launch
+                    val date = _state.value.dateMillis
+
+                    if (updatedSets.isEmpty()){
+                         oneRepMaxRepository.deleteOneRepMax(exerciseId,date)
+                    }
+                    else{
+                        oneRepMaxUseCase(
+                            exerciseId = exerciseId,
+                            date = date,
+                            sets = updatedSets
+                        )
+                    }
+
                 }
             }
 
@@ -104,7 +123,7 @@ class LogWorkoutViewModel (
             is LogWorkoutEvent.SetExercise -> {
                 _state.update { it.copy (exercise = event.exercise, dateMillis = event.dateMillis )}
                 viewModelScope.launch {
-                    repository.getWorkoutByExerciseAndDate(event.exercise.exerciseId,event.dateMillis).first()
+                    repository.getWorkoutByExerciseAndDate(event.exercise.exerciseId,event.dateMillis)
                         .let { list ->
                         _state.update {
                             it.copy(
@@ -119,8 +138,7 @@ class LogWorkoutViewModel (
             is LogWorkoutEvent.SaveWorkout -> {
                 viewModelScope.launch {
                     val dateToSave =
-                        _state.value.dateMillis
-
+                        _state.value.dateMillis ?: System.currentTimeMillis()
                     val currentState = _state.value
                     var allSets = currentState.sets
 // 2. IMPORTANT: If there is valid text in the current input fields, include it!
@@ -148,6 +166,19 @@ class LogWorkoutViewModel (
                     }
                     try {
                         repository.insertWorkoutEntry(finalizedSets) // Use the finalized list!
+                        kotlinx.coroutines.yield()
+
+                        // ✅ trigger 1RM calculation after sets are saved
+                        val exerciseId = _state.value.exercise?.exerciseId
+                        val date = _state.value.dateMillis
+
+                        if (exerciseId != null) {
+                            oneRepMaxUseCase(
+                                exerciseId = exerciseId,
+                                date =  date,
+                                sets = finalizedSets
+                            )
+                        }
                         _uiEvent.emit(LogWorkoutUiEvent.NavBackToHome)
                     } catch (e: Exception) {
                         _uiEvent.emit(LogWorkoutUiEvent.SendSnackbar("Error saving: ${e.message}"))

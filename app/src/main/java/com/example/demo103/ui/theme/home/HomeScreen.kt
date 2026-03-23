@@ -36,6 +36,8 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
@@ -450,6 +452,49 @@ private fun WorkoutCard(
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
+//
+                workout.changePercent?.let { percent ->
+                    val formatted = String.format("%.1f", percent)
+                    val isPositive = percent > 0
+                    val isNeutral = percent == 0.0
+
+                    val percentColor = when {
+                        isPositive -> Color(0xFF22C55E)   // green
+                        isNeutral -> Color(0xFF94A3B8)    // gray
+                        else -> Color(0xFFEF4444)         // red
+                    }
+
+                    val arrowIcon = when {
+                        isPositive -> Icons.Default.KeyboardArrowUp
+                        isNeutral -> Icons.Default.Remove
+                        else -> Icons.Default.KeyboardArrowDown
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(percentColor.copy(alpha = 0.12f))
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = arrowIcon,
+                            contentDescription = null,
+                            tint = percentColor,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(
+                            text = "${if (isPositive) "+" else ""}$formatted%",
+                            color = percentColor,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = if (expanded) "Collapse" else "Expand",

@@ -14,9 +14,11 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.demo103.data.UseCase.OneRepMaxUseCase
 import com.example.demo103.data.db.ExerciseDatabase
 import com.example.demo103.data.entity.ExerciseEntity
 import com.example.demo103.data.repository.ExerciseRepository
+import com.example.demo103.data.repository.OneRepMaxRepository
 import com.example.demo103.data.repository.WorkoutRepository
 import com.example.demo103.di.Demo103App
 import com.example.demo103.navigation.Route
@@ -60,9 +62,11 @@ fun MainNavigation() {
         db.exerciseDao(),
         workoutEntryEntityDao = db.workoutEntryEntityDao()
     )
+    val oneRepMaxRepository = OneRepMaxRepository(db.oneRepMaxEntityDao(), workoutEntryEntityDao = db.workoutEntryEntityDao())
+    val oneRepMaxUseCase = OneRepMaxUseCase(oneRepMaxRepository, workoutRepository)
 
     val homeViewModel: HomeViewModel = viewModel(
-        factory = HomeViewModelFactory(workoutRepository)
+        factory = HomeViewModelFactory(workoutRepository,oneRepMaxRepository, oneRepMaxUseCase )
     )
 
     val exerciseViewModel: ExerciseViewModel = viewModel(
@@ -70,7 +74,7 @@ fun MainNavigation() {
     )
 
     val logWorkoutViewModel: LogWorkoutViewModel= viewModel(
-        factory = LogWorkoutViewModelFactory(workoutRepository)
+        factory = LogWorkoutViewModelFactory(workoutRepository, oneRepMaxRepository,oneRepMaxUseCase )
     )
 
 

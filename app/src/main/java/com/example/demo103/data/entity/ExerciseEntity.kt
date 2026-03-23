@@ -8,12 +8,13 @@ import androidx.room.PrimaryKey
 data class ExerciseEntity(
 
     @PrimaryKey(autoGenerate = true)
-    val exerciseId: Int = 0,  //id
+    @ColumnInfo(name = "exercise_id")
+    val exerciseId: Int = 0,
 
     @ColumnInfo(name="exercise_name")
-    val exerciseName: String,  //bench
+    val exerciseName: String,
 
     @ColumnInfo(name="category")
-    val category:String //chest ,legs,
+    val category:String
 
 )

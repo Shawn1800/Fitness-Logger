@@ -7,15 +7,10 @@ import kotlinx.coroutines.flow.Flow
 
 class ExerciseRepository(
     private val exerciseDao: ExerciseDao,
-    workoutEntryEntityDao: WorkoutEntryEntityDao
+    private val workoutEntryEntityDao:  WorkoutEntryEntityDao
 ) {
     fun getAllExercises(): Flow<List<ExerciseEntity>> {
         return  exerciseDao.getAllExercises()
-    }
-    suspend fun  insertExercise(exercise: ExerciseEntity){
-        throw UnsupportedOperationException(
-            "Custom exercises are not enabled yet"
-        )
     }
     fun searchExercises(query: String): Flow<List<ExerciseEntity>> {
         return exerciseDao.searchExercises(query)
