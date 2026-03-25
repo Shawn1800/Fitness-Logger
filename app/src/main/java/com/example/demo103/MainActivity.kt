@@ -4,34 +4,37 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.setSelectedDate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.demo103.data.UseCase.OneRepMaxUseCase
 import com.example.demo103.data.db.ExerciseDatabase
-import com.example.demo103.data.entity.ExerciseEntity
+import com.example.demo103.data.repository.AuthRepository
 import com.example.demo103.data.repository.ExerciseRepository
 import com.example.demo103.data.repository.OneRepMaxRepository
 import com.example.demo103.data.repository.WorkoutRepository
 import com.example.demo103.di.Demo103App
 import com.example.demo103.navigation.Route
-import com.example.demo103.ui.theme.exercise_selection.ExerciseSelectionScreen
-import com.example.demo103.ui.theme.exercise_selection.ExerciseViewModel
-import com.example.demo103.ui.theme.exercise_selection.ExerciseViewModelFactory
-import com.example.demo103.ui.theme.home.HomeScreen
-import com.example.demo103.ui.theme.home.HomeViewModel
-import com.example.demo103.ui.theme.home.HomeViewModelFactory
-import com.example.demo103.ui.theme.log_workout.LogWorkoutScreen
-import com.example.demo103.ui.theme.log_workout.LogWorkoutViewModel
-import com.example.demo103.ui.theme.log_workout.LogWorkoutViewModelFactory
-import com.example.demo103.ui.theme.theme.Demo103Theme
+import com.example.demo103.ui.screen.exercise_selection.ExerciseSelectionScreen
+import com.example.demo103.ui.screen.exercise_selection.ExerciseViewModel
+import com.example.demo103.ui.screen.exercise_selection.ExerciseViewModelFactory
+import com.example.demo103.ui.screen.home.HomeScreen
+import com.example.demo103.ui.screen.home.HomeViewModel
+import com.example.demo103.ui.screen.home.HomeViewModelFactory
+import com.example.demo103.ui.screen.log_workout.LogWorkoutScreen
+import com.example.demo103.ui.screen.log_workout.LogWorkoutViewModel
+import com.example.demo103.ui.screen.log_workout.LogWorkoutViewModelFactory
+import com.example.demo103.theme.Demo103Theme
+import com.example.demo103.ui.screen.signIn.AuthUiEvent
+import com.example.demo103.ui.screen.signIn.AuthViewModel
+import com.example.demo103.ui.screen.signIn.AuthViewModelFactory
+import com.example.demo103.ui.screen.signIn.LogInScreen
+import com.example.demo103.ui.screen.signIn.SignInScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -65,6 +68,8 @@ fun MainNavigation() {
     val oneRepMaxRepository = OneRepMaxRepository(db.oneRepMaxEntityDao(), workoutEntryEntityDao = db.workoutEntryEntityDao())
     val oneRepMaxUseCase = OneRepMaxUseCase(oneRepMaxRepository, workoutRepository)
 
+    val authRepository = AuthRepository()
+
     val homeViewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(workoutRepository,oneRepMaxRepository, oneRepMaxUseCase )
     )
@@ -77,9 +82,13 @@ fun MainNavigation() {
         factory = LogWorkoutViewModelFactory(workoutRepository, oneRepMaxRepository,oneRepMaxUseCase )
     )
 
+    val authViewModel: AuthViewModel=viewModel(
+        factory = AuthViewModelFactory(authRepository)
+    )
+
 
 //val backStack = rememberNavBackStack <Route> (Route.HomeScreen)
-    val backStack = remember { mutableStateListOf<Route>(Route.HomeScreen) }
+    val backStack = remember { mutableStateListOf<Route>(Route.LogInScreen) }
 
     NavDisplay(
         backStack = backStack,
@@ -124,6 +133,36 @@ fun MainNavigation() {
 
                 )
             }
+
+            entry<Route.LogInScreen>{
+                LogInScreen(
+                    authViewModel=authViewModel,
+                NavToHome={
+                    backStack.clear()
+                    backStack.add(Route.HomeScreen)
+                },
+                    NavToSignIn={
+                        backStack.add(Route.SignInScreen)
+                    }
+
+                )
+            }
+
+            entry<Route.SignInScreen>{
+                SignInScreen(
+                    authViewModel=authViewModel,
+                    NavToHome={
+                        backStack.clear()
+                        backStack.add(Route.HomeScreen)
+                    },
+                    NavToLogIn={
+                        backStack.clear()
+                        backStack.add(Route.LogInScreen)
+                    }
+                )
+            }
+
+
         }
     )
 }
