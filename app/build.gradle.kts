@@ -1,12 +1,16 @@
+
+import com.android.build.api.dsl.ApplicationExtension
+
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    id("com.google.gms.google-services")
 }
 
-android {
-    namespace = "com.example.demo103"
+
+extensions.configure<ApplicationExtension>  {
+    namespace = "com.example.HeavyLifts"
     compileSdk = 36
 
     defaultConfig {
@@ -29,14 +33,19 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+
     buildFeatures {
         compose = true
+    }
+
+
+    configurations.all {
+        resolutionStrategy {
+            force("androidx.concurrent:concurrent-futures:1.2.0")
+        }
     }
 }
 
@@ -49,6 +58,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -56,9 +68,30 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("androidx.compose.material:material-icons-extended:1.7.6")
-    val room_version = "2.8.0" // Note: 2.6.1 is the current stable release
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    val room_version = "2.8.4"
     implementation("androidx.room:room-ktx:$room_version")
     implementation("androidx.room:room-runtime:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
+
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.androidx.material3.adaptive.navigation3)
+    implementation(libs.kotlinx.serialization.core)
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
+
+
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.android.gms:play-services-auth:21.5.1")
+    implementation("com.google.firebase:firebase-auth:24.0.1")
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.2.0")
+
+
 }
