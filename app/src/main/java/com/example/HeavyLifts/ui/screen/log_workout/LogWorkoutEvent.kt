@@ -1,6 +1,6 @@
-package com.example.demo103.ui.screen.log_workout
+package com.example.HeavyLifts.ui.screen.log_workout
 
-import com.example.demo103.data.entity.ExerciseEntity
+import com.example.HeavyLifts.data.entity.ExerciseEntity
 
 sealed interface LogWorkoutEvent {
     data class  OnAddingSets(val exerciseId : Int) : LogWorkoutEvent

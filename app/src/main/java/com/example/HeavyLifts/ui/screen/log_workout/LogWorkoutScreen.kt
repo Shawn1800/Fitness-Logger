@@ -1,4 +1,4 @@
-package com.example.demo103.ui.screen.log_workout
+package com.example.HeavyLifts.ui.screen.log_workout
 
 
 import androidx.compose.foundation.BorderStroke
@@ -49,7 +49,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.demo103.data.entity.ExerciseEntity
+import com.example.HeavyLifts.data.entity.ExerciseEntity
 
 
 private object AppColors {

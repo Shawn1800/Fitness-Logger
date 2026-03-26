@@ -1,9 +1,9 @@
-package com.example.demo103.ui.screen.exercise_selection
+package com.example.HeavyLifts.ui.screen.exercise_selection
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.demo103.data.repository.ExerciseRepository
-import com.example.demo103.data.repository.WorkoutRepository
+import com.example.HeavyLifts.data.repository.ExerciseRepository
+import com.example.HeavyLifts.data.repository.WorkoutRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow

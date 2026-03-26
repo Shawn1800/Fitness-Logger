@@ -1,4 +1,4 @@
-package com.example.demo103.data.editableUiData.Workoutday
+package com.example.HeavyLifts.data.editableUiData.Workoutday
 
 data class EditableWorkoutExercise(
     val workoutExerciseId: Int,

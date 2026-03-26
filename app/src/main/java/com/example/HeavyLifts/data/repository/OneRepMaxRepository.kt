@@ -1,8 +1,8 @@
-package com.example.demo103.data.repository
+package com.example.HeavyLifts.data.repository
 
-import com.example.demo103.data.dao.OneRepMaxEntityDao
-import com.example.demo103.data.dao.WorkoutEntryEntityDao
-import com.example.demo103.data.entity.OneRepMaxEntity
+import com.example.HeavyLifts.data.dao.OneRepMaxEntityDao
+import com.example.HeavyLifts.data.dao.WorkoutEntryEntityDao
+import com.example.HeavyLifts.data.entity.OneRepMaxEntity
 import kotlinx.coroutines.flow.Flow
 
 class OneRepMaxRepository(

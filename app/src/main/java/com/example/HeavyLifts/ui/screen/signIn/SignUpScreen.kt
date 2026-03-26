@@ -1,4 +1,4 @@
-package com.example.demo103.ui.screen.signIn
+package com.example.HeavyLifts.ui.screen.signIn
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement

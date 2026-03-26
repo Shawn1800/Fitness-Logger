@@ -1,6 +1,6 @@
-package com.example.demo103.ui.screen.exercise_selection
+package com.example.HeavyLifts.ui.screen.exercise_selection
 
-import com.example.demo103.data.entity.ExerciseEntity
+import com.example.HeavyLifts.data.entity.ExerciseEntity
 
 sealed class ExerciseEvent {
     data class OnSearchQueryChange(val query :String ): ExerciseEvent()

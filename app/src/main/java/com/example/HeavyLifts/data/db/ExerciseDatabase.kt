@@ -1,17 +1,16 @@
-package com.example.demo103.data.db
+package com.example.HeavyLifts.data.db
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.Room
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.demo103.data.entity.ExerciseEntity
-import com.example.demo103.data.entity.WorkoutEntryEntity
-import com.example.demo103.data.entity.OneRepMaxEntity
-import com.example.demo103.data.dao.ExerciseDao
-import com.example.demo103.data.dao.WorkoutEntryEntityDao
-import com.example.demo103.data.dao.OneRepMaxEntityDao
-import com.example.demo103.data.db.ExerciseDatabase.Companion.defaultExercises
+import com.example.HeavyLifts.data.entity.ExerciseEntity
+import com.example.HeavyLifts.data.entity.WorkoutEntryEntity
+import com.example.HeavyLifts.data.entity.OneRepMaxEntity
+import com.example.HeavyLifts.data.dao.ExerciseDao
+import com.example.HeavyLifts.data.dao.WorkoutEntryEntityDao
+import com.example.HeavyLifts.data.dao.OneRepMaxEntityDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

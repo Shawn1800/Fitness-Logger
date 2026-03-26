@@ -1,10 +1,10 @@
-package com.example.demo103.data.dao
+package com.example.HeavyLifts.data.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.demo103.data.entity.ExerciseEntity
+import com.example.HeavyLifts.data.entity.ExerciseEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

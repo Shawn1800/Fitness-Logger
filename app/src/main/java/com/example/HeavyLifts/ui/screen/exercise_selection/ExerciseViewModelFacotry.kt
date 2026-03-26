@@ -1,9 +1,9 @@
-package com.example.demo103.ui.screen.exercise_selection
+package com.example.HeavyLifts.ui.screen.exercise_selection
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.demo103.data.repository.ExerciseRepository
-import com.example.demo103.data.repository.WorkoutRepository
+import com.example.HeavyLifts.data.repository.ExerciseRepository
+import com.example.HeavyLifts.data.repository.WorkoutRepository
 
 //A Factory helps recreate the ViewModel with the same parameters
 // after a configuration change, ensuring seamless user experience

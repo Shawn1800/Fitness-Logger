@@ -1,6 +1,5 @@
 
 import com.android.build.api.dsl.ApplicationExtension
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
@@ -11,7 +10,7 @@ plugins {
 
 
 extensions.configure<ApplicationExtension>  {
-    namespace = "com.example.demo103"
+    namespace = "com.example.HeavyLifts"
     compileSdk = 36
 
     defaultConfig {
@@ -96,5 +95,3 @@ dependencies {
 
 
 }
-
-

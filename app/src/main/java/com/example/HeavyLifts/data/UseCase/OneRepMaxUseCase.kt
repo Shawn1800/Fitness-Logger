@@ -1,10 +1,9 @@
-package com.example.demo103.data.UseCase
+package com.example.HeavyLifts.data.UseCase
 
-import com.example.demo103.data.entity.OneRepMaxEntity
-import com.example.demo103.data.entity.WorkoutEntryEntity
-import com.example.demo103.data.repository.OneRepMaxRepository
-import com.example.demo103.data.repository.WorkoutRepository
-import java.time.LocalDate
+import com.example.HeavyLifts.data.entity.OneRepMaxEntity
+import com.example.HeavyLifts.data.entity.WorkoutEntryEntity
+import com.example.HeavyLifts.data.repository.OneRepMaxRepository
+import com.example.HeavyLifts.data.repository.WorkoutRepository
 
 class OneRepMaxUseCase  (
     private  val oneRepMaxRepository: OneRepMaxRepository,

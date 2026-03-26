@@ -1,4 +1,4 @@
-package com.example.demo103
+package com.example.HeavyLifts
 
 import org.junit.Test
 

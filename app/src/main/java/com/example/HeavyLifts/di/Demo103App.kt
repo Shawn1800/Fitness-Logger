@@ -1,4 +1,4 @@
-package com.example.demo103.di
+package com.example.HeavyLifts.di
 
 import android.app.Application
 

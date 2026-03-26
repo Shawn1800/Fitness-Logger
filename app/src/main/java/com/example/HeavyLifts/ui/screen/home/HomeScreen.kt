@@ -1,4 +1,4 @@
-package com.example.demo103.ui.screen.home
+package com.example.HeavyLifts.ui.screen.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -43,10 +43,10 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import com.example.demo103.data.entity.ExerciseEntity
-import com.example.demo103.ui.screen.signIn.AuthEvent
-import com.example.demo103.ui.screen.signIn.AuthUiEvent
-import com.example.demo103.ui.screen.signIn.AuthViewModel
+import com.example.HeavyLifts.data.entity.ExerciseEntity
+import com.example.HeavyLifts.ui.screen.signIn.AuthEvent
+import com.example.HeavyLifts.ui.screen.signIn.AuthUiEvent
+import com.example.HeavyLifts.ui.screen.signIn.AuthViewModel
 import kotlinx.coroutines.launch
 
 // ─── Theme Constants ──────────────────────────────────────────────────────────

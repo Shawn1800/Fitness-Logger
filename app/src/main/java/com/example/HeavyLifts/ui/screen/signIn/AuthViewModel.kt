@@ -1,9 +1,9 @@
-package com.example.demo103.ui.screen.signIn
+package com.example.HeavyLifts.ui.screen.signIn
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.demo103.data.repository.AuthRepository
-import com.example.demo103.ui.screen.signIn.AuthEvent.*
+import com.example.HeavyLifts.data.repository.AuthRepository
+import com.example.HeavyLifts.ui.screen.signIn.AuthEvent.*
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

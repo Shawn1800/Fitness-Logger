@@ -1,7 +1,7 @@
-package com.example.demo103.ui.screen.log_workout
+package com.example.HeavyLifts.ui.screen.log_workout
 
-import com.example.demo103.data.entity.ExerciseEntity
-import com.example.demo103.data.entity.WorkoutEntryEntity
+import com.example.HeavyLifts.data.entity.ExerciseEntity
+import com.example.HeavyLifts.data.entity.WorkoutEntryEntity
 
 data class LogWorkoutState (
    val currentWeight:String ="",// we use String cause doubles can crash ,we convert later

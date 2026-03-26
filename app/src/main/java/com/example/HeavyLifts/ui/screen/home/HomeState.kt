@@ -1,4 +1,4 @@
-package com.example.demo103.ui.screen.home
+package com.example.HeavyLifts.ui.screen.home
 
 import java.time.LocalDate
 

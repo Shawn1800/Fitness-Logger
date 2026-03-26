@@ -1,6 +1,6 @@
-package com.example.demo103.ui.screen.home
+package com.example.HeavyLifts.ui.screen.home
 
-import com.example.demo103.data.entity.ExerciseEntity
+import com.example.HeavyLifts.data.entity.ExerciseEntity
 import java.time.LocalDate
 
 sealed interface HomeEvent {

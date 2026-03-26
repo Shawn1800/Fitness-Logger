@@ -1,10 +1,10 @@
-package com.example.demo103.ui.screen.log_workout
+package com.example.HeavyLifts.ui.screen.log_workout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.demo103.data.UseCase.OneRepMaxUseCase
-import com.example.demo103.data.repository.OneRepMaxRepository
-import com.example.demo103.data.repository.WorkoutRepository
+import com.example.HeavyLifts.data.UseCase.OneRepMaxUseCase
+import com.example.HeavyLifts.data.repository.OneRepMaxRepository
+import com.example.HeavyLifts.data.repository.WorkoutRepository
 
 class LogWorkoutViewModelFactory (
     private val repository: WorkoutRepository,

@@ -1,4 +1,4 @@
-package com.example.demo103.ui.screen.signIn
+package com.example.HeavyLifts.ui.screen.signIn
 
 data class AuthState(
     val email: String = "",
