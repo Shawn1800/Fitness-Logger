@@ -1,4 +1,4 @@
-package com.example.demo103.ui.screen.analytics
+package com.example.HeavyLifts.ui.screen.analytics
 
 class AnalyticsViewModelFactory {
 }

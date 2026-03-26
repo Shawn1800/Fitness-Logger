@@ -1,8 +1,8 @@
-package com.example.demo103.data.repository
+package com.example.HeavyLifts.data.repository
 
-import com.example.demo103.data.entity.WorkoutEntryEntity
-import com.example.demo103.data.dao.WorkoutEntryEntityDao
-import com.example.demo103.data.entity.WorkoutWithExercise
+import com.example.HeavyLifts.data.entity.WorkoutEntryEntity
+import com.example.HeavyLifts.data.dao.WorkoutEntryEntityDao
+import com.example.HeavyLifts.data.entity.WorkoutWithExercise
 import kotlinx.coroutines.flow.Flow
 
 class WorkoutRepository(private val workoutEntryEntityDao: WorkoutEntryEntityDao) {

@@ -1,12 +1,12 @@
-package com.example.demo103.data.dao
+package com.example.HeavyLifts.data.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.example.demo103.data.entity.WorkoutEntryEntity
-import com.example.demo103.data.entity.WorkoutWithExercise
+import com.example.HeavyLifts.data.entity.WorkoutEntryEntity
+import com.example.HeavyLifts.data.entity.WorkoutWithExercise
 import kotlinx.coroutines.flow.Flow
 
 //also called appContainer

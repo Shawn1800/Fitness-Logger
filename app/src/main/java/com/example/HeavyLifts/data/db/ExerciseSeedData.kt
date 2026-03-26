@@ -1,6 +1,5 @@
-package com.example.demo103.data.db
+package com.example.HeavyLifts.data.db
 
-import com.example.demo103.data.entity.ExerciseEntity
 //
 //val defaultExercises= listOf(
 //    ExerciseEntity(exerciseName = "bench Press",category="chest"),

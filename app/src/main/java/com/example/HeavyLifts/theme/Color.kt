@@ -1,4 +1,4 @@
-package com.example.demo103.theme
+package com.example.HeavyLifts.theme
 
 import androidx.compose.ui.graphics.Color
 

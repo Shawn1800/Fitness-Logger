@@ -1,4 +1,4 @@
-package com.example.demo103.ui.screen.signIn
+package com.example.HeavyLifts.ui.screen.signIn
 
 sealed interface AuthEvent {
     data object LogIn : AuthEvent

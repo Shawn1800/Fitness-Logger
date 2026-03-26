@@ -1,4 +1,4 @@
-package com.example.demo103.data.entity
+package com.example.HeavyLifts.data.entity
 
 import androidx.room.Embedded
 import androidx.room.Relation

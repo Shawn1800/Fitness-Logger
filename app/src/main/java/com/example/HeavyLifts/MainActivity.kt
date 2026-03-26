@@ -1,4 +1,4 @@
-package com.example.demo103
+package com.example.HeavyLifts
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,34 +7,31 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.example.demo103.data.UseCase.OneRepMaxUseCase
-import com.example.demo103.data.db.ExerciseDatabase
-import com.example.demo103.data.repository.AuthRepository
-import com.example.demo103.data.repository.ExerciseRepository
-import com.example.demo103.data.repository.OneRepMaxRepository
-import com.example.demo103.data.repository.WorkoutRepository
-import com.example.demo103.di.Demo103App
-import com.example.demo103.navigation.Route
-import com.example.demo103.ui.screen.exercise_selection.ExerciseSelectionScreen
-import com.example.demo103.ui.screen.exercise_selection.ExerciseViewModel
-import com.example.demo103.ui.screen.exercise_selection.ExerciseViewModelFactory
-import com.example.demo103.ui.screen.home.HomeScreen
-import com.example.demo103.ui.screen.home.HomeViewModel
-import com.example.demo103.ui.screen.home.HomeViewModelFactory
-import com.example.demo103.ui.screen.log_workout.LogWorkoutScreen
-import com.example.demo103.ui.screen.log_workout.LogWorkoutViewModel
-import com.example.demo103.ui.screen.log_workout.LogWorkoutViewModelFactory
-import com.example.demo103.theme.Demo103Theme
-import com.example.demo103.ui.screen.signIn.AuthUiEvent
-import com.example.demo103.ui.screen.signIn.AuthViewModel
-import com.example.demo103.ui.screen.signIn.AuthViewModelFactory
-import com.example.demo103.ui.screen.signIn.LogInScreen
-import com.example.demo103.ui.screen.signIn.SignUpScreen
+import com.example.HeavyLifts.data.UseCase.OneRepMaxUseCase
+import com.example.HeavyLifts.data.db.ExerciseDatabase
+import com.example.HeavyLifts.data.repository.AuthRepository
+import com.example.HeavyLifts.data.repository.ExerciseRepository
+import com.example.HeavyLifts.data.repository.OneRepMaxRepository
+import com.example.HeavyLifts.data.repository.WorkoutRepository
+import com.example.HeavyLifts.navigation.Route
+import com.example.HeavyLifts.ui.screen.exercise_selection.ExerciseSelectionScreen
+import com.example.HeavyLifts.ui.screen.exercise_selection.ExerciseViewModel
+import com.example.HeavyLifts.ui.screen.exercise_selection.ExerciseViewModelFactory
+import com.example.HeavyLifts.ui.screen.home.HomeScreen
+import com.example.HeavyLifts.ui.screen.home.HomeViewModel
+import com.example.HeavyLifts.ui.screen.home.HomeViewModelFactory
+import com.example.HeavyLifts.ui.screen.log_workout.LogWorkoutScreen
+import com.example.HeavyLifts.ui.screen.log_workout.LogWorkoutViewModel
+import com.example.HeavyLifts.ui.screen.log_workout.LogWorkoutViewModelFactory
+import com.example.HeavyLifts.theme.Demo103Theme
+import com.example.HeavyLifts.ui.screen.signIn.AuthViewModel
+import com.example.HeavyLifts.ui.screen.signIn.AuthViewModelFactory
+import com.example.HeavyLifts.ui.screen.signIn.LogInScreen
+import com.example.HeavyLifts.ui.screen.signIn.SignUpScreen
 
 class MainActivity : ComponentActivity() {
 

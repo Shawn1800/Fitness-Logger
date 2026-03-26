@@ -1,4 +1,4 @@
-package com.example.demo103
+package com.example.HeavyLifts
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

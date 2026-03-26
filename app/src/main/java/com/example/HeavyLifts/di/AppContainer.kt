@@ -1,14 +1,14 @@
-package com.example.demo103.di
+package com.example.HeavyLifts.di
 
 import android.content.Context
-import com.example.demo103.data.UseCase.OneRepMaxUseCase
-import com.example.demo103.data.dao.ExerciseDao
-import com.example.demo103.data.dao.OneRepMaxEntityDao
-import com.example.demo103.data.dao.WorkoutEntryEntityDao
-import com.example.demo103.data.db.ExerciseDatabase
-import com.example.demo103.data.repository.ExerciseRepository
-import com.example.demo103.data.repository.OneRepMaxRepository
-import com.example.demo103.data.repository.WorkoutRepository
+import com.example.HeavyLifts.data.UseCase.OneRepMaxUseCase
+import com.example.HeavyLifts.data.dao.ExerciseDao
+import com.example.HeavyLifts.data.dao.OneRepMaxEntityDao
+import com.example.HeavyLifts.data.dao.WorkoutEntryEntityDao
+import com.example.HeavyLifts.data.db.ExerciseDatabase
+import com.example.HeavyLifts.data.repository.ExerciseRepository
+import com.example.HeavyLifts.data.repository.OneRepMaxRepository
+import com.example.HeavyLifts.data.repository.WorkoutRepository
 
 class AppContainer (context: Context){
 

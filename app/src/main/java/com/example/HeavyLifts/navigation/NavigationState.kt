@@ -1,4 +1,4 @@
-package com.example.demo103.navigation
+package com.example.HeavyLifts.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
