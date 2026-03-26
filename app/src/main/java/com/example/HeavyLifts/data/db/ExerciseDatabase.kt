@@ -1,21 +1,20 @@
 package com.example.demo103.data.db
 
 import android.content.Context
-import androidx.lifecycle.ViewModelProvider.NewInstanceFactory.Companion.instance
+import androidx.room.Database
+import androidx.room.RoomDatabase
 import androidx.room.Room
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.demo103.data.entity.ExerciseEntity
 import com.example.demo103.data.entity.WorkoutEntryEntity
+import com.example.demo103.data.entity.OneRepMaxEntity
 import com.example.demo103.data.dao.ExerciseDao
 import com.example.demo103.data.dao.WorkoutEntryEntityDao
+import com.example.demo103.data.dao.OneRepMaxEntityDao
+import com.example.demo103.data.db.ExerciseDatabase.Companion.defaultExercises
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import com.example.demo103.data.dao.OneRepMaxEntityDao
-import com.example.demo103.data.db.ExerciseDatabase.Companion.defaultExercises
-import com.example.demo103.data.entity.OneRepMaxEntity
 
 @Database(
     entities = [ExerciseEntity::class, WorkoutEntryEntity::class, OneRepMaxEntity::class],
@@ -48,6 +47,7 @@ abstract class ExerciseDatabase : RoomDatabase() {
                     ExerciseDatabase::class.java,
                     "exercise_db"
                 )
+                    .fallbackToDestructiveMigration() // For development: clears data on schema change
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)

@@ -11,7 +11,7 @@ sealed interface Route : NavKey {
     data object LogInScreen:Route ,NavKey
 
     @Serializable
-    data object SignInScreen:Route ,NavKey
+    data object SignUpScreen :Route ,NavKey
 
     @Serializable
     data object HomeScreen: Route , NavKey

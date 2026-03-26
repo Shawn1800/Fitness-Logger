@@ -34,16 +34,13 @@ import com.example.demo103.ui.screen.signIn.AuthUiEvent
 import com.example.demo103.ui.screen.signIn.AuthViewModel
 import com.example.demo103.ui.screen.signIn.AuthViewModelFactory
 import com.example.demo103.ui.screen.signIn.LogInScreen
-import com.example.demo103.ui.screen.signIn.SignInScreen
+import com.example.demo103.ui.screen.signIn.SignUpScreen
 
 class MainActivity : ComponentActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val app = application as Demo103App
-
 
         enableEdgeToEdge()
 
@@ -86,27 +83,36 @@ fun MainNavigation() {
         factory = AuthViewModelFactory(authRepository)
     )
 
-
-//val backStack = rememberNavBackStack <Route> (Route.HomeScreen)
-    val backStack = remember { mutableStateListOf<Route>(Route.LogInScreen) }
+    // Check if user is logged in to decide initial screen
+    val initialRoute = remember {
+        if (authRepository.isUserLoggedIn()) Route.HomeScreen else Route.LogInScreen
+    }
+    val backStack = remember { mutableStateListOf<Route>(initialRoute) }
 
     NavDisplay(
         backStack = backStack,
         onBack = {
-            backStack.removeLastOrNull()
-                 },
+            if (backStack.size > 1) {
+                backStack.removeLastOrNull()
+            }
+        },
         entryProvider = entryProvider {
             entry<Route.HomeScreen>{
                     HomeScreen(
                         homeViewModel = homeViewModel,
+                        authViewModel = authViewModel,
                         onNavigateToLogWorkout = { exercise ->
                             val date = homeViewModel.state.value.selectedDateMillis ?: System.currentTimeMillis()
-                            backStack.add(Route.LogWorkoutScreen(exercise,date))  // pass exercise
+                            backStack.add(Route.LogWorkoutScreen(exercise,date))
                         },
                         onNavigateToExerciseSelection = {
                             val selectedDate = homeViewModel.state.value.selectedDateMillis
                             exerciseViewModel.setSelectedDate(selectedDate ?:System.currentTimeMillis())
                             backStack.add(Route.ExerciseScreen)
+                        },
+                        onNavigateToLogIn ={
+                            backStack.clear()
+                            backStack.add(Route.LogInScreen)
                         }
                     )
                 }
@@ -116,7 +122,7 @@ fun MainNavigation() {
                     viewModel = exerciseViewModel,
                     onNavigateToLogWorkout = { exercise ->
                         val date = homeViewModel.state.value.selectedDateMillis ?: System.currentTimeMillis()
-                        backStack.add(Route.LogWorkoutScreen(exercise,date))  // pass exercise
+                        backStack.add(Route.LogWorkoutScreen(exercise,date))
                     } ,
                     onBack = { backStack.removeLastOrNull() },
                 )
@@ -130,26 +136,24 @@ fun MainNavigation() {
                     onBack = {
                         backStack.removeAll { it !is Route.HomeScreen }
                     }
-
                 )
             }
 
             entry<Route.LogInScreen>{
                 LogInScreen(
                     authViewModel=authViewModel,
-                NavToHome={
-                    backStack.clear()
-                    backStack.add(Route.HomeScreen)
-                },
-                    NavToSignIn={
-                        backStack.add(Route.SignInScreen)
+                    NavToHome={
+                        backStack.clear()
+                        backStack.add(Route.HomeScreen)
+                    },
+                    NavToSignUp={
+                        backStack.add(Route.SignUpScreen)
                     }
-
                 )
             }
 
-            entry<Route.SignInScreen>{
-                SignInScreen(
+            entry<Route.SignUpScreen>{
+                SignUpScreen(
                     authViewModel=authViewModel,
                     NavToHome={
                         backStack.clear()
@@ -161,11 +165,6 @@ fun MainNavigation() {
                     }
                 )
             }
-
-
         }
     )
 }
-
-
-

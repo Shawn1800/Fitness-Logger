@@ -1,11 +1,11 @@
-package com.example.demo103.ui.screen.log_workout
+package com.example.HeavyLifts.ui.screen.log_workout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.demo103.data.UseCase.OneRepMaxUseCase
-import com.example.demo103.data.entity.WorkoutEntryEntity
-import com.example.demo103.data.repository.OneRepMaxRepository
-import com.example.demo103.data.repository.WorkoutRepository
+import com.example.HeavyLifts.data.UseCase.OneRepMaxUseCase
+import com.example.HeavyLifts.data.entity.WorkoutEntryEntity
+import com.example.HeavyLifts.data.repository.OneRepMaxRepository
+import com.example.HeavyLifts.data.repository.WorkoutRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -182,6 +182,4 @@ class LogWorkoutViewModel (
                     }
                 }
             }
-        }
-    }
-}
+      

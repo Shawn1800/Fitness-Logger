@@ -7,6 +7,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -30,16 +31,23 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.runtime.saveable.rememberSaveable
+
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.demo103.data.entity.ExerciseEntity
+import com.example.demo103.ui.screen.signIn.AuthEvent
+import com.example.demo103.ui.screen.signIn.AuthUiEvent
+import com.example.demo103.ui.screen.signIn.AuthViewModel
+import kotlinx.coroutines.launch
 
 // ─── Theme Constants ──────────────────────────────────────────────────────────
 private object AppColors {
@@ -54,19 +62,32 @@ private object AppColors {
 }
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
+    authViewModel: AuthViewModel= viewModel(),
     onNavigateToExerciseSelection: () -> Unit,
     onNavigateToLogWorkout: (ExerciseEntity) -> Unit,
+    onNavigateToLogIn: () -> Unit
 ) {
     val state by homeViewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        homeViewModel.uiEvent.collect { event ->
-            when (event) {
-                is HomeUiEvent.NavigateToExerciseSelection -> onNavigateToExerciseSelection()
-                is HomeUiEvent.NavigateToLogWorkout -> onNavigateToLogWorkout(event.exercise)
+        launch {
+            authViewModel.uiEvent.collect { event ->
+                if (event is AuthUiEvent.NavToLogIn) {
+                    onNavigateToLogIn()
+                }
+            }
+        }
+
+        launch {
+            homeViewModel.uiEvent.collect { event ->
+                when (event) {
+                    is HomeUiEvent.NavigateToExerciseSelection -> onNavigateToExerciseSelection()
+                    is HomeUiEvent.NavigateToLogWorkout -> onNavigateToLogWorkout(event.exercise)
+                }
             }
         }
     }
@@ -79,20 +100,21 @@ fun HomeScreen(
     ) { paddingValues ->
         HomeContent(
             state = state,
-            homeViewModel = homeViewModel,
             paddingValues = paddingValues,
-            onDateSelected = { date -> homeViewModel.onEvent(HomeEvent.OnDateSelected(date)) }
+            onDateSelected = { date -> homeViewModel.onEvent(HomeEvent.OnDateSelected(date)) },
+            onEvent = { homeViewModel.onEvent(it) },
+            onLogoutClick = { authViewModel.onEvent(AuthEvent.LogOut) }
         )
     }
 }
-
 // ─── Content ──────────────────────────────────────────────────────────────────
 @Composable
 private fun HomeContent(
     state: HomeState,
-    homeViewModel: HomeViewModel,
     paddingValues: PaddingValues,
-    onDateSelected: (LocalDate) -> Unit
+    onDateSelected: (LocalDate) -> Unit,
+    onEvent: (HomeEvent) -> Unit,
+    onLogoutClick: () -> Unit
 ) {
     val totalWeeks = 500
     val pagerState = rememberPagerState(
@@ -109,12 +131,16 @@ private fun HomeContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppColors.Background)
             .padding(paddingValues)
+            .background(AppColors.Background),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        MonthHeader(monthName = currentMonthName)
+        MonthHeader(
+            monthName = currentMonthName,
+            onLogoutClick = onLogoutClick
+        )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         WeeklyCalendar(
             pagerState = pagerState,
@@ -123,43 +149,56 @@ private fun HomeContent(
             onDateSelected = onDateSelected
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Thin divider to separate calendar from list
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
             color = AppColors.Stroke,
             thickness = 0.5.dp
         )
 
-        when {
-            state.isLoading -> LoadingIndicator()
-            state.errorMessage != null -> ErrorMessage(message = state.errorMessage)
-            state.workouts.isEmpty() -> EmptyWorkoutsMessage()
-            else -> WorkoutList(
-                workouts = state.workouts,
-                onEvent = { event -> homeViewModel.onEvent(event) }
-            )
+        Box(modifier = Modifier.weight(1f)) {
+            when {
+                state.isLoading -> LoadingIndicator()
+                state.errorMessage != null -> ErrorMessage(message = state.errorMessage)
+                state.workouts.isEmpty() -> EmptyWorkoutsMessage()
+                else -> WorkoutList(
+                    workouts = state.workouts,
+                    onEvent = onEvent
+                )
+            }
         }
     }
 }
 
 // ─── Top Bar ──────────────────────────────────────────────────────────────────
 @Composable
-private fun MonthHeader(monthName: String) {
-    Box(
+private fun MonthHeader(
+    monthName: String,
+    onLogoutClick: () -> Unit
+) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 32.dp, start = 20.dp, end = 20.dp),
-        contentAlignment = Alignment.TopStart
+            .padding(top = 16.dp, start = 20.dp, end = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = monthName,
             color = AppColors.TextPrimary,
             fontWeight = FontWeight.ExtraBold,
             fontSize = 30.sp,
-            letterSpacing = (-0.5).sp
+            letterSpacing = (-0.5).sp,
+            modifier = Modifier.weight(1f)
         )
+        
+        IconButton(onClick = onLogoutClick) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Logout,
+                contentDescription = "Logout",
+                tint = AppColors.TextSecondary,
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
 }
 
@@ -227,7 +266,6 @@ private fun DateItem(
     val dayName = date.dayOfWeek.getDisplayName(TextStyle.SHORT, locale)
     val dayNumber = date.dayOfMonth.toString()
 
-    // Animate the card color so selection feels snappy
     val cardColor by animateColorAsState(
         targetValue = when {
             isSelected -> AppColors.Primary
@@ -280,14 +318,12 @@ private fun AddWorkoutFab(onClick: () -> Unit) {
         onClick = onClick,
         containerColor = AppColors.Primary,
         contentColor = Color.White,
-        shape = RoundedCornerShape(18.dp)  // squircle shape
+        shape = RoundedCornerShape(18.dp)
     ) {
-        Text(
-            text = "+",
-            fontSize = 28.sp,
-            color = Color.White,
-            fontWeight = FontWeight.Light,
-            lineHeight = 28.sp
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = "Add Workout",
+            tint = Color.White
         )
     }
 }
@@ -309,7 +345,7 @@ fun WorkoutList(
 
     LazyColumn(
         state = listState,
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
     ) {
@@ -346,7 +382,7 @@ private fun WorkoutCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
-        border = BorderStroke(0.5.dp, AppColors.Stroke)  // subtle border lifts card off BG
+        border = BorderStroke(0.5.dp, AppColors.Stroke)
     ) {
         Row(
             modifier = Modifier
@@ -354,7 +390,6 @@ private fun WorkoutCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.Top
         ) {
-            // Left: color accent bar
             Box(
                 modifier = Modifier
                     .width(3.dp)
@@ -365,7 +400,6 @@ private fun WorkoutCard(
 
             Spacer(modifier = Modifier.width(14.dp))
 
-            // Middle: exercise name + sets
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = workout.exercise.exerciseName,
@@ -399,14 +433,12 @@ private fun WorkoutCard(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Always show first set as preview
                 Text(
                     text = "Set 1 · ${workout.sets.first().weight} kg × ${workout.sets.first().reps} reps",
                     color = AppColors.TextSecondary,
                     fontSize = 13.sp
                 )
 
-                // Show remaining sets only when expanded
                 AnimatedVisibility(visible = expanded) {
                     Column {
                         workout.sets.drop(1).forEachIndexed { index, set ->
@@ -423,7 +455,6 @@ private fun WorkoutCard(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Right: set count badge + chevron stacked
             Column(horizontalAlignment = Alignment.End) {
                 Box(
                     modifier = Modifier
@@ -438,17 +469,16 @@ private fun WorkoutCard(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                Spacer(modifier = Modifier.height(12.dp))
-//
+                
                 workout.changePercent?.let { percent ->
                     val formatted = String.format("%.1f", percent)
                     val isPositive = percent > 0
                     val isNeutral = percent == 0.0
 
                     val percentColor = when {
-                        isPositive -> Color(0xFF22C55E)   // green
-                        isNeutral -> Color(0xFF94A3B8)    // gray
-                        else -> Color(0xFFEF4444)         // red
+                        isPositive -> Color(0xFF22C55E)
+                        isNeutral -> Color(0xFF94A3B8)
+                        else -> Color(0xFFEF4444)
                     }
 
                     val arrowIcon = when {
@@ -457,7 +487,7 @@ private fun WorkoutCard(
                         else -> Icons.Default.KeyboardArrowDown
                     }
 
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -481,6 +511,8 @@ private fun WorkoutCard(
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.weight(1f))
 
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
@@ -536,7 +568,7 @@ private fun ErrorMessage(message: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
             text = message,
-            color = Color(0xFFCF6679),   // softer red — less jarring on dark BG
+            color = Color(0xFFCF6679),
             fontSize = 15.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 24.dp)

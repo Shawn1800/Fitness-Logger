@@ -1,12 +1,12 @@
-package com.example.demo103.ui.screen.home
+package com.example.HeavyLifts.ui.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.demo103.data.UseCase.OneRepMaxUseCase
-import com.example.demo103.data.entity.ExerciseEntity
-import com.example.demo103.data.entity.WorkoutEntryEntity
-import com.example.demo103.data.repository.OneRepMaxRepository
-import com.example.demo103.data.repository.WorkoutRepository
+import com.example.HeavyLifts.data.UseCase.OneRepMaxUseCase
+import com.example.HeavyLifts.data.entity.ExerciseEntity
+import com.example.HeavyLifts.data.entity.WorkoutEntryEntity
+import com.example.HeavyLifts.data.repository.OneRepMaxRepository
+import com.example.HeavyLifts.data.repository.WorkoutRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*

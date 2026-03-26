@@ -1,4 +1,4 @@
-package com.example.demo103.ui.screen.exercise_selection
+package com.example.HeavyLifts.ui.screen.exercise_selection
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.demo103.data.entity.ExerciseEntity
+import com.example.HeavyLifts.data.entity.ExerciseEntity
 import kotlin.collections.List
 
 private object AppColors {
