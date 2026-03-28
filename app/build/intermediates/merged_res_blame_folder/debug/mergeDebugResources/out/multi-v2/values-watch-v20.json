@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.HeavyLifts.app-mergeDebugResources-57:/values-watch-v20/values-watch-v20.xml",
+            "outputFile": "com.example.heavyLifts.app-mergeDebugResources-57:/values-watch-v20/values-watch-v20.xml",
             "map": [
                 {
                     "source": "C:\\Users\\qwert\\.gradle\\caches\\9.4.0\\transforms\\5d03ff2579985c05d6c260d0383ec7bc\\transformed\\play-services-auth-21.5.1\\res\\values-watch-v20\\values.xml",

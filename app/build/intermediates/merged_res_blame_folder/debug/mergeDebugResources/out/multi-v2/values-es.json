@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.HeavyLifts.app-mergeDebugResources-57:/values-es/values-es.xml",
+            "outputFile": "com.example.heavyLifts.app-mergeDebugResources-57:/values-es/values-es.xml",
             "map": [
                 {
                     "source": "C:\\Users\\qwert\\.gradle\\caches\\9.4.0\\transforms\\edd0a090ddbbba0a86bc11945bf9917e\\transformed\\browser-1.4.0\\res\\values-es\\values-es.xml",

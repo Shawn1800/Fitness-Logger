@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.HeavyLifts.app-mergeDebugResources-57:/values-te/values-te.xml",
+            "outputFile": "com.example.heavyLifts.app-mergeDebugResources-57:/values-te/values-te.xml",
             "map": [
                 {
                     "source": "C:\\Users\\qwert\\.gradle\\caches\\9.4.0\\transforms\\3507cf9bb13ca85174de43f320002ee7\\transformed\\biometric-1.1.0\\res\\values-te\\values-te.xml",

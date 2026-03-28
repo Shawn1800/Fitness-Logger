@@ -194,7 +194,7 @@ MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\qwert\.gradle\c
 		ADDED from C:\Users\qwert\AndroidStudioProjects\Demo103\app\src\main\AndroidManifest.xml:8:9-65
 	android:name
 		ADDED from C:\Users\qwert\AndroidStudioProjects\Demo103\app\src\main\AndroidManifest.xml:6:9-40
-activity#com.example.HeavyLifts.MainActivity
+activity#com.example.heavyLifts.MainActivity
 ADDED from C:\Users\qwert\AndroidStudioProjects\Demo103\app\src\main\AndroidManifest.xml:15:9-25:20
 	android:label
 		ADDED from C:\Users\qwert\AndroidStudioProjects\Demo103\app\src\main\AndroidManifest.xml:18:13-45

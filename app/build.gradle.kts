@@ -10,7 +10,7 @@ plugins {
 
 
 extensions.configure<ApplicationExtension>  {
-    namespace = "com.example.HeavyLifts"
+    namespace = "com.example.heavyLifts"
     compileSdk = 36
 
     defaultConfig {

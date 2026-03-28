@@ -1,4 +1,4 @@
-com.example.HeavyLifts
+com.example.heavyLifts
 color black
 color purple_200
 color purple_500

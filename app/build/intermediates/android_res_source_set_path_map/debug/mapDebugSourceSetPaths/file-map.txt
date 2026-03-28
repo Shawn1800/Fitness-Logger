@@ -1,8 +1,8 @@
-com.example.HeavyLifts.app-pngs-0 C:\Users\qwert\AndroidStudioProjects\Demo103\app\build\generated\res\pngs\debug
-com.example.HeavyLifts.app-res-1 C:\Users\qwert\AndroidStudioProjects\Demo103\app\build\generated\res\processDebugGoogleServices
-com.example.HeavyLifts.app-updated_navigation_xml-2 C:\Users\qwert\AndroidStudioProjects\Demo103\app\build\generated\updated_navigation_xml\debug
-com.example.HeavyLifts.app-packageDebugResources-3 C:\Users\qwert\AndroidStudioProjects\Demo103\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
-com.example.HeavyLifts.app-packageDebugResources-4 C:\Users\qwert\AndroidStudioProjects\Demo103\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
-com.example.HeavyLifts.app-debug-5 C:\Users\qwert\AndroidStudioProjects\Demo103\app\build\intermediates\merged_res\debug\mergeDebugResources
-com.example.HeavyLifts.app-debug-6 C:\Users\qwert\AndroidStudioProjects\Demo103\app\src\debug\res
-com.example.HeavyLifts.app-main-7 C:\Users\qwert\AndroidStudioProjects\Demo103\app\src\main\res
+com.example.heavyLifts.app-pngs-0 C:\Users\qwert\AndroidStudioProjects\Demo103\app\build\generated\res\pngs\debug
+com.example.heavyLifts.app-res-1 C:\Users\qwert\AndroidStudioProjects\Demo103\app\build\generated\res\processDebugGoogleServices
+com.example.heavyLifts.app-updated_navigation_xml-2 C:\Users\qwert\AndroidStudioProjects\Demo103\app\build\generated\updated_navigation_xml\debug
+com.example.heavyLifts.app-packageDebugResources-3 C:\Users\qwert\AndroidStudioProjects\Demo103\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.example.heavyLifts.app-packageDebugResources-4 C:\Users\qwert\AndroidStudioProjects\Demo103\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.example.heavyLifts.app-debug-5 C:\Users\qwert\AndroidStudioProjects\Demo103\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.example.heavyLifts.app-debug-6 C:\Users\qwert\AndroidStudioProjects\Demo103\app\src\debug\res
+com.example.heavyLifts.app-main-7 C:\Users\qwert\AndroidStudioProjects\Demo103\app\src\main\res

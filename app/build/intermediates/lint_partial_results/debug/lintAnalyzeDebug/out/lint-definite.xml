@@ -1,0 +1,771 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 9.1.0" type="incidents">
+
+    <incident
+        id="RedundantLabel"
+        severity="warning"
+        message="Redundant label can be removed">
+        <fix-attribute
+            description="Delete label"
+            namespace="http://schemas.android.com/apk/res/android"
+            attribute="label"/>
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*manifest*0}"
+            line="18"
+            column="13"
+            startOffset="715"
+            endLine="18"
+            endColumn="45"
+            endOffset="747"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.core:core-ktx than 1.17.0 is available: 1.18.0">
+        <fix-replace
+            description="Change to 1.18.0"
+            family="Update versions"
+            oldString="1.17.0"
+            replacement="1.18.0"
+            priority="0"/>
+        <location
+            file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+            line="4"
+            column="11"
+            startOffset="53"
+            endLine="4"
+            endColumn="19"
+            endOffset="61"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.activity:activity-compose than 1.12.4 is available: 1.13.0">
+        <fix-replace
+            description="Change to 1.13.0"
+            family="Update versions"
+            oldString="1.12.4"
+            replacement="1.13.0"
+            priority="0"/>
+        <location
+            file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+            line="9"
+            column="19"
+            startOffset="174"
+            endLine="9"
+            endColumn="27"
+            endOffset="182"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.compose:compose-bom than 2026.02.01 is available: 2026.03.01">
+        <fix-replace
+            description="Change to 2026.03.01"
+            family="Update versions"
+            oldString="2026.02.01"
+            replacement="2026.03.01"
+            priority="0"/>
+        <location
+            file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+            line="10"
+            column="14"
+            startOffset="196"
+            endLine="10"
+            endColumn="26"
+            endOffset="208"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.lifecycle:lifecycle-viewmodel-navigation3 than 2.11.0-alpha01 is available: 2.11.0-alpha03">
+        <fix-replace
+            description="Change to 2.11.0-alpha03"
+            family="Update versions"
+            oldString="2.11.0-alpha01"
+            replacement="2.11.0-alpha03"
+            priority="0"/>
+        <location
+            file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+            line="13"
+            column="26"
+            startOffset="267"
+            endLine="13"
+            endColumn="42"
+            endOffset="283"/>
+    </incident>
+
+    <incident
+        id="NewerVersionAvailable"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin.android than 2.3.10 is available: 2.3.20">
+        <fix-replace
+            description="Change to 2.3.20"
+            family="Update versions"
+            oldString="2.3.10"
+            replacement="2.3.20"
+            priority="0"/>
+        <location
+            file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+            line="3"
+            column="10"
+            startOffset="34"
+            endLine="3"
+            endColumn="18"
+            endOffset="42"/>
+    </incident>
+
+    <incident
+        id="NewerVersionAvailable"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin.plugin.compose than 2.3.10 is available: 2.3.20">
+        <fix-replace
+            description="Change to 2.3.20"
+            family="Update versions"
+            oldString="2.3.10"
+            replacement="2.3.20"
+            priority="0"/>
+        <location
+            file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+            line="3"
+            column="10"
+            startOffset="34"
+            endLine="3"
+            endColumn="18"
+            endOffset="42"/>
+    </incident>
+
+    <incident
+        id="NewerVersionAvailable"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin.plugin.serialization than 2.3.10 is available: 2.3.20">
+        <fix-replace
+            description="Change to 2.3.20"
+            family="Update versions"
+            oldString="2.3.10"
+            replacement="2.3.20"
+            priority="0"/>
+        <location
+            file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+            line="14"
+            column="23"
+            startOffset="306"
+            endLine="14"
+            endColumn="31"
+            endOffset="314"/>
+    </incident>
+
+    <incident
+        id="ObsoleteSdkInt"
+        severity="warning"
+        message="This folder configuration (`v26`) is unnecessary; `minSdkVersion` is 26. Merge all the resources in this folder into `mipmap-anydpi`.">
+        <fix-data file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/mipmap-anydpi-v26" folderName="mipmap-anydpi" requiresApi="26"/>
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/mipmap-anydpi-v26"/>
+    </incident>
+
+    <incident
+        id="VectorPath"
+        severity="warning"
+        message="Very long vector path (7909 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector.">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/drawable/ic_launcher_foreground.xml"
+            line="14"
+            column="27"
+            startOffset="546"
+            endLine="14"
+            endColumn="7936"
+            endOffset="8455"/>
+    </incident>
+
+    <incident
+        id="VectorPath"
+        severity="warning"
+        message="Very long vector path (4555 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector.">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/drawable/ic_launcher_foreground.xml"
+            line="17"
+            column="27"
+            startOffset="8534"
+            endLine="17"
+            endColumn="4582"
+            endOffset="13089"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use version catalog instead">
+        <fix-alternatives>
+            <fix-composite
+                description="Replace with new library catalog declaration, reusing version variable lifecycleRuntimeKtx"
+                robot="true"
+                independent="true">
+                <fix-replace
+                    description="Replace with androidx-lifecycle-lifecycle-viewmodel-compose = { module = &quot;androidx.lifecycle:lifecycle-viewmodel-compose&quot;, version.ref = &quot;lifecycleRuntimeKtx&quot; }..."
+                    robot="true"
+                    independent="true"
+                    oldString="_lint_insert_begin_"
+                    replacement="androidx-lifecycle-lifecycle-viewmodel-compose = { module = &quot;androidx.lifecycle:lifecycle-viewmodel-compose&quot;, version.ref = &quot;lifecycleRuntimeKtx&quot; }&#xA;"
+                    priority="0">
+                    <range
+                        file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                        startOffset="600"
+                        endOffset="600"/>
+                </fix-replace>
+                <fix-replace
+                    description="Replace with libs.androidx.lifecycle.lifecycle.viewmodel.compose"
+                    robot="true"
+                    independent="true"
+                    replacement="libs.androidx.lifecycle.lifecycle.viewmodel.compose"
+                    priority="0">
+                    <range
+                        file="${:app*projectDir}/build.gradle.kts"
+                        startOffset="2082"
+                        endOffset="2137"/>
+                </fix-replace>
+            </fix-composite>
+            <fix-composite
+                description="Replace with new library catalog declaration for androidx-lifecycle-lifecycle-viewmodel-compose2"
+                robot="true">
+                <fix-replace
+                    description="Replace with lifecycleViewmodelComposeVersion = &quot;2.10.0&quot;..."
+                    robot="true"
+                    oldString="_lint_insert_begin_"
+                    replacement="lifecycleViewmodelComposeVersion = &quot;2.10.0&quot;&#xA;"
+                    priority="0">
+                    <range
+                        file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                        startOffset="223"
+                        endOffset="223"/>
+                </fix-replace>
+                <fix-replace
+                    description="Replace with androidx-lifecycle-lifecycle-viewmodel-compose2 = { module = &quot;androidx.lifecycle:lifecycle-viewmodel-compose&quot;, version.ref = &quot;lifecycleViewmodelComposeVersion&quot; }..."
+                    robot="true"
+                    oldString="_lint_insert_begin_"
+                    replacement="androidx-lifecycle-lifecycle-viewmodel-compose2 = { module = &quot;androidx.lifecycle:lifecycle-viewmodel-compose&quot;, version.ref = &quot;lifecycleViewmodelComposeVersion&quot; }&#xA;"
+                    priority="0">
+                    <range
+                        file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                        startOffset="600"
+                        endOffset="600"/>
+                </fix-replace>
+                <fix-replace
+                    description="Replace with libs.androidx.lifecycle.lifecycle.viewmodel.compose2"
+                    robot="true"
+                    replacement="libs.androidx.lifecycle.lifecycle.viewmodel.compose2"
+                    priority="0">
+                    <range
+                        file="${:app*projectDir}/build.gradle.kts"
+                        startOffset="2082"
+                        endOffset="2137"/>
+                </fix-replace>
+            </fix-composite>
+        </fix-alternatives>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="71"
+            column="20"
+            startOffset="2082"
+            endLine="71"
+            endColumn="75"
+            endOffset="2137"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use version catalog instead">
+        <fix-composite
+            description="Replace with new library catalog declaration for androidx-foundation"
+            robot="true">
+            <fix-replace
+                description="Replace with androidx-foundation = { module = &quot;androidx.compose.foundation:foundation&quot; }..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="androidx-foundation = { module = &quot;androidx.compose.foundation:foundation&quot; }&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="600"
+                    endOffset="600"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with libs.androidx.foundation"
+                robot="true"
+                replacement="libs.androidx.foundation"
+                priority="0">
+                <range
+                    file="${:app*projectDir}/build.gradle.kts"
+                    startOffset="2158"
+                    endOffset="2198"/>
+            </fix-replace>
+        </fix-composite>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="72"
+            column="20"
+            startOffset="2158"
+            endLine="72"
+            endColumn="60"
+            endOffset="2198"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use version catalog instead">
+        <fix-composite
+            description="Replace with new library catalog declaration for androidx-material-icons-extended"
+            robot="true">
+            <fix-replace
+                description="Replace with materialIconsExtendedVersion = &quot;1.7.8&quot;..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="materialIconsExtendedVersion = &quot;1.7.8&quot;&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="223"
+                    endOffset="223"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with androidx-material-icons-extended = { module = &quot;androidx.compose.material:material-icons-extended&quot;, version.ref = &quot;materialIconsExtendedVersion&quot; }..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="androidx-material-icons-extended = { module = &quot;androidx.compose.material:material-icons-extended&quot;, version.ref = &quot;materialIconsExtendedVersion&quot; }&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="600"
+                    endOffset="600"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with libs.androidx.material.icons.extended"
+                robot="true"
+                replacement="libs.androidx.material.icons.extended"
+                priority="0">
+                <range
+                    file="${:app*projectDir}/build.gradle.kts"
+                    startOffset="2219"
+                    endOffset="2276"/>
+            </fix-replace>
+        </fix-composite>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="73"
+            column="20"
+            startOffset="2219"
+            endLine="73"
+            endColumn="77"
+            endOffset="2276"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use version catalog instead">
+        <fix-composite
+            description="Replace with new library catalog declaration for room-ktx"
+            robot="true">
+            <fix-replace
+                description="Replace with roomKtxVersion = &quot;2.8.4&quot;..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="roomKtxVersion = &quot;2.8.4&quot;&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="494"
+                    endOffset="494"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with room-ktx = { module = &quot;androidx.room:room-ktx&quot;, version.ref = &quot;roomKtxVersion&quot; }..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="room-ktx = { module = &quot;androidx.room:room-ktx&quot;, version.ref = &quot;roomKtxVersion&quot; }&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="2958"
+                    endOffset="2958"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with libs.room.ktx"
+                robot="true"
+                replacement="libs.room.ktx"
+                priority="0">
+                <range
+                    file="${:app*projectDir}/build.gradle.kts"
+                    startOffset="2328"
+                    endOffset="2366"/>
+            </fix-replace>
+        </fix-composite>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="75"
+            column="20"
+            startOffset="2328"
+            endLine="75"
+            endColumn="58"
+            endOffset="2366"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use version catalog instead">
+        <fix-composite
+            description="Replace with new library catalog declaration for room-runtime"
+            robot="true">
+            <fix-replace
+                description="Replace with roomRuntimeVersion = &quot;2.8.4&quot;..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="roomRuntimeVersion = &quot;2.8.4&quot;&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="494"
+                    endOffset="494"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with room-runtime = { module = &quot;androidx.room:room-runtime&quot;, version.ref = &quot;roomRuntimeVersion&quot; }..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="room-runtime = { module = &quot;androidx.room:room-runtime&quot;, version.ref = &quot;roomRuntimeVersion&quot; }&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="2958"
+                    endOffset="2958"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with libs.room.runtime"
+                robot="true"
+                replacement="libs.room.runtime"
+                priority="0">
+                <range
+                    file="${:app*projectDir}/build.gradle.kts"
+                    startOffset="2387"
+                    endOffset="2429"/>
+            </fix-replace>
+        </fix-composite>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="76"
+            column="20"
+            startOffset="2387"
+            endLine="76"
+            endColumn="62"
+            endOffset="2429"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use version catalog instead">
+        <fix-composite
+            description="Replace with new library catalog declaration for room-compiler"
+            robot="true">
+            <fix-replace
+                description="Replace with roomCompilerVersion = &quot;2.8.4&quot;..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="roomCompilerVersion = &quot;2.8.4&quot;&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="494"
+                    endOffset="494"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with room-compiler = { module = &quot;androidx.room:room-compiler&quot;, version.ref = &quot;roomCompilerVersion&quot; }..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="room-compiler = { module = &quot;androidx.room:room-compiler&quot;, version.ref = &quot;roomCompilerVersion&quot; }&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="2958"
+                    endOffset="2958"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with libs.room.compiler"
+                robot="true"
+                replacement="libs.room.compiler"
+                priority="0">
+                <range
+                    file="${:app*projectDir}/build.gradle.kts"
+                    startOffset="2439"
+                    endOffset="2482"/>
+            </fix-replace>
+        </fix-composite>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="77"
+            column="9"
+            startOffset="2439"
+            endLine="77"
+            endColumn="52"
+            endOffset="2482"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use version catalog instead">
+        <fix-composite
+            description="Replace with new library catalog declaration for google-firebase-bom"
+            robot="true">
+            <fix-replace
+                description="Replace with firebaseBomVersion = &quot;34.11.0&quot;..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="firebaseBomVersion = &quot;34.11.0&quot;&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="25"
+                    endOffset="25"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with google-firebase-bom = { module = &quot;com.google.firebase:firebase-bom&quot;, version.ref = &quot;firebaseBomVersion&quot; }..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="google-firebase-bom = { module = &quot;com.google.firebase:firebase-bom&quot;, version.ref = &quot;firebaseBomVersion&quot; }&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="600"
+                    endOffset="600"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with libs.google.firebase.bom"
+                robot="true"
+                replacement="libs.google.firebase.bom"
+                priority="0">
+                <range
+                    file="${:app*projectDir}/build.gradle.kts"
+                    startOffset="2831"
+                    endOffset="2873"/>
+            </fix-replace>
+        </fix-composite>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="86"
+            column="29"
+            startOffset="2831"
+            endLine="86"
+            endColumn="71"
+            endOffset="2873"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use version catalog instead (com.google.firebase:firebase-auth is already available as `firebase-auth`, but using version 24.0.1 instead)">
+        <fix-alternatives>
+            <fix-composite
+                description="Replace with new library catalog declaration for com-google-firebase-firebase-auth"
+                robot="true"
+                independent="true">
+                <fix-replace
+                    description="Replace with com-google-firebase-firebase-auth = { module = &quot;com.google.firebase:firebase-auth&quot; }..."
+                    robot="true"
+                    independent="true"
+                    oldString="_lint_insert_begin_"
+                    replacement="com-google-firebase-firebase-auth = { module = &quot;com.google.firebase:firebase-auth&quot; }&#xA;"
+                    priority="0">
+                    <range
+                        file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                        startOffset="600"
+                        endOffset="600"/>
+                </fix-replace>
+                <fix-replace
+                    description="Replace with libs.com.google.firebase.firebase.auth"
+                    robot="true"
+                    independent="true"
+                    replacement="libs.com.google.firebase.firebase.auth"
+                    priority="0">
+                    <range
+                        file="${:app*projectDir}/build.gradle.kts"
+                        startOffset="2897"
+                        endOffset="2932"/>
+                </fix-replace>
+            </fix-composite>
+            <fix-replace
+                description="Replace with existing version catalog reference `firebase-auth` (version 24.0.1)"
+                replacement="libs.firebase.auth"
+                priority="0">
+                <range
+                    file="${:app*projectDir}/build.gradle.kts"
+                    startOffset="2897"
+                    endOffset="2932"/>
+            </fix-replace>
+        </fix-alternatives>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="89"
+            column="20"
+            startOffset="2897"
+            endLine="89"
+            endColumn="55"
+            endOffset="2932"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use version catalog instead">
+        <fix-composite
+            description="Replace with new library catalog declaration for gms-play-services-auth"
+            robot="true">
+            <fix-replace
+                description="Replace with playServicesAuthVersion = &quot;21.5.1&quot;..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="playServicesAuthVersion = &quot;21.5.1&quot;&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="494"
+                    endOffset="494"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with gms-play-services-auth = { module = &quot;com.google.android.gms:play-services-auth&quot;, version.ref = &quot;playServicesAuthVersion&quot; }..."
+                robot="true"
+                oldString="_lint_insert_begin_"
+                replacement="gms-play-services-auth = { module = &quot;com.google.android.gms:play-services-auth&quot;, version.ref = &quot;playServicesAuthVersion&quot; }&#xA;"
+                priority="0">
+                <range
+                    file="$HOME/AndroidStudioProjects/Demo103/gradle/libs.versions.toml"
+                    startOffset="600"
+                    endOffset="600"/>
+            </fix-replace>
+            <fix-replace
+                description="Replace with libs.gms.play.services.auth"
+                robot="true"
+                replacement="libs.gms.play.services.auth"
+                priority="0">
+                <range
+                    file="${:app*projectDir}/build.gradle.kts"
+                    startOffset="2953"
+                    endOffset="3003"/>
+            </fix-replace>
+        </fix-composite>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="90"
+            column="20"
+            startOffset="2953"
+            endLine="90"
+            endColumn="70"
+            endOffset="3003"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use the existing version catalog reference (`libs.firebase.auth`) instead">
+        <fix-replace
+            description="Replace with existing version catalog reference `firebase-auth`"
+            robot="true"
+            independent="true"
+            replacement="libs.firebase.auth"
+            priority="0">
+            <range
+                file="${:app*projectDir}/build.gradle.kts"
+                startOffset="3024"
+                endOffset="3066"/>
+        </fix-replace>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="91"
+            column="20"
+            startOffset="3024"
+            endLine="91"
+            endColumn="62"
+            endOffset="3066"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use the existing version catalog reference (`libs.androidx.credentials`) instead">
+        <fix-replace
+            description="Replace with existing version catalog reference `androidx-credentials`"
+            robot="true"
+            independent="true"
+            replacement="libs.androidx.credentials"
+            priority="0">
+            <range
+                file="${:app*projectDir}/build.gradle.kts"
+                startOffset="3087"
+                endOffset="3127"/>
+        </fix-replace>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="92"
+            column="20"
+            startOffset="3087"
+            endLine="92"
+            endColumn="60"
+            endOffset="3127"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use the existing version catalog reference (`libs.androidx.credentials.play.services.auth`) instead">
+        <fix-replace
+            description="Replace with existing version catalog reference `androidx-credentials-play-services-auth`"
+            robot="true"
+            independent="true"
+            replacement="libs.androidx.credentials.play.services.auth"
+            priority="0">
+            <range
+                file="${:app*projectDir}/build.gradle.kts"
+                startOffset="3148"
+                endOffset="3207"/>
+        </fix-replace>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="93"
+            column="20"
+            startOffset="3148"
+            endLine="93"
+            endColumn="79"
+            endOffset="3207"/>
+    </incident>
+
+    <incident
+        id="UseTomlInstead"
+        severity="warning"
+        message="Use the existing version catalog reference (`libs.googleid`) instead">
+        <fix-replace
+            description="Replace with existing version catalog reference `googleid`"
+            robot="true"
+            independent="true"
+            replacement="libs.googleid"
+            priority="0">
+            <range
+                file="${:app*projectDir}/build.gradle.kts"
+                startOffset="3228"
+                endOffset="3291"/>
+        </fix-replace>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="94"
+            column="20"
+            startOffset="3228"
+            endLine="94"
+            endColumn="83"
+            endOffset="3291"/>
+    </incident>
+
+</incidents>

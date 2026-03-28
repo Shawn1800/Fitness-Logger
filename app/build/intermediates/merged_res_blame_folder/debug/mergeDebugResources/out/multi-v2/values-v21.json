@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.HeavyLifts.app-mergeDebugResources-57:/values-v21/values-v21.xml",
+            "outputFile": "com.example.heavyLifts.app-mergeDebugResources-57:/values-v21/values-v21.xml",
             "map": [
                 {
                     "source": "C:\\Users\\qwert\\.gradle\\caches\\9.4.0\\transforms\\437e844d44f61955df8c8aa1ef4390a3\\transformed\\credentials-play-services-auth-1.6.0-beta01\\res\\values-v21\\values-v21.xml",
