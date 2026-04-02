@@ -4,23 +4,27 @@ import com.android.build.api.dsl.ApplicationExtension
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.ksp)
     id("com.google.gms.google-services")
+    kotlin("plugin.serialization") version "2.3.10"
+
 }
 
 
 extensions.configure<ApplicationExtension>  {
-    namespace = "com.example.heavyLifts"
+    namespace = "com.ghostbug.heavyLifts"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.demo103"
+        applicationId = "com.ghostbug.heavyLifts"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "SUPABASE_URL", "\"https://zuhhteysfliayqxvruaw.supabase.co\"")
+        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"sb_publishable_yWxEUoNBT-wX3R-H0Fs8QA_fgaFntw-\"")
     }
 
     buildTypes {
@@ -39,6 +43,7 @@ extensions.configure<ApplicationExtension>  {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
 
@@ -71,10 +76,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
-    val room_version = "2.8.4"
-    implementation("androidx.room:room-ktx:$room_version")
-    implementation("androidx.room:room-runtime:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
 
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.navigation3.runtime)
@@ -82,16 +83,18 @@ dependencies {
     implementation(libs.androidx.material3.adaptive.navigation3)
     implementation(libs.kotlinx.serialization.core)
 
-    // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
 
 
-    implementation("com.google.firebase:firebase-auth")
     implementation("com.google.android.gms:play-services-auth:21.5.1")
-    implementation("com.google.firebase:firebase-auth:24.0.1")
     implementation("androidx.credentials:credentials:1.5.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.2.0")
+
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.4.1"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
+
+    implementation("io.ktor:ktor-client-android:3.4.1")
 
 
 }
