@@ -5,6 +5,7 @@ import com.ghostbug.heavyLifts.data.domain.WorkoutWithExercise
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.Instant
+import java.time.OffsetDateTime
 
 
 @Serializable
@@ -18,12 +19,21 @@ data class WorkoutWithExerciseDto(
 )
 
 fun WorkoutWithExerciseDto.toDomain(): WorkoutWithExercise {
+    val millis = try {
+        Instant.parse(date).toEpochMilli()
+    } catch (e: Exception) {
+        try {
+            OffsetDateTime.parse(date).toInstant().toEpochMilli()
+        } catch (e2: Exception) {
+            0L
+        }
+    }
     return WorkoutWithExercise(
         id = id,
         weight = weight,
         reps = reps,
         sets = sets,
-        date = Instant.parse(date).toEpochMilli(),
+        date = millis,
         exercise = ExerciseEntity(
             id = exercise.id,
             exerciseName = exercise.exerciseName,

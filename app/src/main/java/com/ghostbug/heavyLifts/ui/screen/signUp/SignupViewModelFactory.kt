@@ -1,8 +1,9 @@
 package com.ghostbug.heavyLifts.ui.screen.signUp
 
-import AuthRepository
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.ghostbug.heavyLifts.data.repository.AuthRepository
 
 class SignUpViewModelFactory(
     private val authRepository: AuthRepository

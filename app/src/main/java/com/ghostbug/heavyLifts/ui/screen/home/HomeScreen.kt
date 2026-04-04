@@ -1,7 +1,5 @@
 package com.ghostbug.heavyLifts.ui.screen.home
 
-import SignInUiEvent
-import SignInViewModel
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -36,7 +34,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.runtime.saveable.rememberSaveable
 
@@ -78,7 +75,7 @@ fun HomeScreen(
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        homeViewModel.refresh()
+        homeViewModel.onEvent(HomeEvent.RefreshWorkouts)
     }
 
     LaunchedEffect(Unit) {
@@ -108,7 +105,7 @@ fun HomeScreen(
             onDismissRequest = { showLogoutDialog = !showLogoutDialog },
             onLogoutClick = {
                 showLogoutDialog = !showLogoutDialog
-                signUpViewModel.onEvent(SignUpEvent.OnNavigateToSignIn) // Perform logout
+                signUpViewModel.onEvent(SignUpEvent.OnNavigateToSignIn)
             }
         )
     }
@@ -128,7 +125,7 @@ fun HomeScreen(
         )
     }
 }
-// ─── Content ──────────────────────────────────────────────────────────────────
+
 @Composable
 private fun HomeContent(
     state: HomeState,
@@ -189,7 +186,6 @@ private fun HomeContent(
     }
 }
 
-// ─── Top Bar ──────────────────────────────────────────────────────────────────
 @Composable
 private fun MonthHeader(
     monthName: String,
@@ -210,7 +206,7 @@ private fun MonthHeader(
             letterSpacing = (-0.5).sp,
             modifier = Modifier.weight(1f)
         )
-        
+
         IconButton(onClick = onLogoutClick) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Logout,
@@ -228,7 +224,6 @@ fun LogoutDialog(
     onLogoutClick: () -> Unit,
 ) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
-        // Draw a rectangle shape with rounded corners inside the dialog
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -237,8 +232,7 @@ fun LogoutDialog(
             shape = RoundedCornerShape(16.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -247,8 +241,7 @@ fun LogoutDialog(
                     modifier = Modifier.padding(16.dp),
                 )
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     TextButton(
@@ -269,7 +262,6 @@ fun LogoutDialog(
     }
 }
 
-// ─── Calendar ─────────────────────────────────────────────────────────────────
 @Composable
 private fun WeeklyCalendar(
     pagerState: PagerState,
@@ -378,7 +370,6 @@ private fun DateItem(
     }
 }
 
-// ─── FAB ──────────────────────────────────────────────────────────────────────
 @Composable
 private fun AddWorkoutFab(onClick: () -> Unit) {
     FloatingActionButton(
@@ -395,7 +386,6 @@ private fun AddWorkoutFab(onClick: () -> Unit) {
     }
 }
 
-// ─── Workout List ─────────────────────────────────────────────────────────────
 @Composable
 fun WorkoutList(
     workouts: List<GroupedWorkout>,
@@ -428,7 +418,6 @@ fun WorkoutList(
     }
 }
 
-// ─── Workout Card ─────────────────────────────────────────────────────────────
 @Composable
 private fun WorkoutCard(
     workout: GroupedWorkout,
@@ -445,200 +434,202 @@ private fun WorkoutCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
             .clickable { expanded = !expanded },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
-        border = BorderStroke(0.5.dp, AppColors.Stroke)
+        border = BorderStroke(1.dp, AppColors.Stroke.copy(alpha = 0.5f))
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.Top
-        ) {
-            Box(
-                modifier = Modifier
-                    .width(3.dp)
-                    .height(52.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(AppColors.Primary)
-            )
-
-            Spacer(modifier = Modifier.width(14.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = workout.exercise.exerciseName,
-                    color = AppColors.TextPrimary,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = (-0.2).sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Button(
-                    onClick = AddSetClick,
-                    contentPadding = PaddingValues(horizontal = 12.dp),
-                    modifier = Modifier.height(28.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = AppColors.Primary.copy(alpha = 0.18f),
-                        contentColor = AppColors.Primary
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(0.dp)
-                ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Add Set",
+                        text = workout.exercise.exerciseName,
+                        color = AppColors.TextPrimary,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = workout.exercise.category,
+                        color = AppColors.TextSecondary,
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Medium
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Set 1 · ${workout.sets.first().weight} kg × ${workout.sets.first().reps} reps",
-                    color = AppColors.TextSecondary,
-                    fontSize = 13.sp
-                )
-
-                AnimatedVisibility(visible = expanded) {
-                    Column {
-                        workout.sets.drop(1).forEachIndexed { index, set ->
-                            Spacer(modifier = Modifier.height(3.dp))
-                            Text(
-                                text = "Set ${index + 2} · ${set.weight} kg × ${set.reps} reps",
-                                color = AppColors.TextSecondary,
-                                fontSize = 13.sp
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Column(horizontalAlignment = Alignment.End) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(AppColors.Primary.copy(alpha = 0.15f))
-                        .padding(horizontal = 10.dp, vertical = 5.dp)
-                ) {
-                    Text(
-                        text = "${workout.sets.size} sets",
-                        color = AppColors.Primary,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                
                 workout.changePercent?.let { percent ->
-                    val formatted = String.format(Locale.US, "%.1f", percent)
-                    val isPositive = percent > 0
-                    val isNeutral = percent == 0.0
-
-                    val percentColor = when {
-                        isPositive -> Color(0xFF22C55E)
-                        isNeutral -> Color(0xFF94A3B8)
-                        else -> Color(0xFFEF4444)
-                    }
-
-                    val arrowIcon = when {
-                        isPositive -> Icons.Default.KeyboardArrowUp
-                        isNeutral -> Icons.Default.Remove
-                        else -> Icons.Default.KeyboardArrowDown
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(percentColor.copy(alpha = 0.12f))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    val isPositive = percent >= 0
+                    Surface(
+                        color = if (isPositive) Color(0xFF102A1E) else Color(0xFF2A1010),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.padding(start = 12.dp)
                     ) {
-                        Icon(
-                            imageVector = arrowIcon,
-                            contentDescription = null,
-                            tint = percentColor,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(3.dp))
                         Text(
-                            text = "${if (isPositive) "+" else ""}$formatted%",
-                            color = percentColor,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
+                            text = (if (isPositive) "+" else "") + "%.1f%%".format(percent),
+                            color = if (isPositive) Color(0xFF4ADE80) else Color(0xFFF87171),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                     }
                 }
-
-                Spacer(modifier = Modifier.weight(1f))
 
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = if (expanded) "Collapse" else "Expand",
+                    contentDescription = null,
                     tint = AppColors.TextSecondary,
                     modifier = Modifier
-                        .size(20.dp)
+                        .padding(start = 8.dp)
                         .rotate(rotation)
                 )
+            }
+
+            AnimatedVisibility(visible = !expanded) {
+                Column {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "${workout.sets.size} sets total",
+                        color = AppColors.TextSecondary,
+                        fontSize = 13.sp
+                    )
+                }
+            }
+
+            AnimatedVisibility(visible = expanded) {
+                Column {
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    workout.sets.forEachIndexed { index, set ->
+                        SetRow(
+                            setNumber = index + 1,
+                            weight = set.weight,
+                            reps = set.reps
+                        )
+                        if (index < workout.sets.lastIndex) {
+                            HorizontalDivider(
+                                color = AppColors.Stroke.copy(alpha = 0.3f),
+                                modifier = Modifier.padding(vertical = 12.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Button(
+                        onClick = AddSetClick,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.PrimaryDim),
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(12.dp)
+                    ) {
+                        Icon(Icons.Default.Add, null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Edit Workout", fontWeight = FontWeight.Bold)
+                    }
+                }
             }
         }
     }
 }
 
-// ─── Empty / Loading / Error States ──────────────────────────────────────────
+@Composable
+private fun SetRow(
+    setNumber: Int,
+    weight: Float,
+    reps: Int
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Surface(
+                color = AppColors.Stroke,
+                shape = RoundedCornerShape(6.dp),
+                modifier = Modifier.size(24.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = setNumber.toString(),
+                        color = AppColors.TextSecondary,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = "${weight} kg",
+                color = AppColors.TextPrimary,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
+        Text(
+            text = "$reps reps",
+            color = AppColors.TextSecondary,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium
+        )
+    }
+}
+
 @Composable
 private fun LoadingIndicator() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator(
-            color = AppColors.Primary,
-            strokeWidth = 2.dp,
-            modifier = Modifier.size(36.dp)
-        )
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(color = AppColors.Primary)
+    }
+}
+
+@Composable
+private fun ErrorMessage(message: String) {
+    Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
+        Text(message, color = Color.Red, textAlign = TextAlign.Center)
     }
 }
 
 @Composable
 private fun EmptyWorkoutsMessage() {
     Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 80.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "💪", fontSize = 44.sp)
-        Spacer(modifier = Modifier.height(12.dp))
+        Surface(
+            color = AppColors.Surface,
+            shape = RoundedCornerShape(24.dp),
+            modifier = Modifier.size(80.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Default.Remove,
+                    contentDescription = null,
+                    tint = AppColors.TextSecondary,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "No workouts logged",
+            "No workouts recorded",
             color = AppColors.TextPrimary,
-            fontSize = 17.sp,
-            fontWeight = FontWeight.SemiBold
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
         )
-        Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "Tap + to start today's session",
+            "Select a date or tap + to start",
             color = AppColors.TextSecondary,
-            fontSize = 13.sp
-        )
-    }
-}
-
-@Composable
-private fun ErrorMessage(message: String) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            text = message,
-            color = Color(0xFFCF6679),
-            fontSize = 15.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 24.dp)
+            fontSize = 14.sp,
+            modifier = Modifier.padding(top = 8.dp)
         )
     }
 }

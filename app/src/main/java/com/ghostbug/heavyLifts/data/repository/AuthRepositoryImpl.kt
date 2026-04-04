@@ -1,12 +1,13 @@
 package com.ghostbug.heavyLifts.data.repository
 
-import AuthRepository
+import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
 
-class AuthRepositoryImpl (
-    private val auth: io.github.jan.supabase.auth.Auth
-):AuthRepository{
+class AuthRepositoryImpl(
+    private val auth: Auth
+) : AuthRepository {
+
     override suspend fun signIn(email: String, password: String): Boolean {
         return try {
             auth.signInWith(Email) {
@@ -47,5 +48,4 @@ class AuthRepositoryImpl (
     override fun getCurrentUserId(): String? {
         return auth.currentUserOrNull()?.id
     }
-
 }

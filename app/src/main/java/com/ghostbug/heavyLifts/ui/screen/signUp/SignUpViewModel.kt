@@ -1,8 +1,9 @@
 package com.ghostbug.heavyLifts.ui.screen.signUp
 
-import AuthRepository
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ghostbug.heavyLifts.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

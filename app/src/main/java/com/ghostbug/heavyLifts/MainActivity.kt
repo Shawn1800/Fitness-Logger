@@ -1,6 +1,6 @@
 package com.ghostbug.heavyLifts
 
-import AuthRepository
+
 import SignInViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.ghostbug.heavyLifts.data.UseCase.OneRepMaxUseCase
+import com.ghostbug.heavyLifts.data.repository.AuthRepository
 import com.ghostbug.heavyLifts.data.repository.AuthRepositoryImpl
 import com.ghostbug.heavyLifts.navigation.Route
 import com.ghostbug.heavyLifts.ui.screen.exercise_selection.ExerciseSelectionScreen
@@ -81,9 +82,9 @@ fun MainNavigation() {
     val exerciseRepository = remember { ExerciseRepositoryImpl(supabase.postgrest, supabase.auth) }
     val oneRepMaxRepository = remember { OneRepMaxRepositoryImpl(supabase.postgrest, supabase.auth) }
 
-    val oneRepMaxUseCase = OneRepMaxUseCase(oneRepMaxRepository)
+    val oneRepMaxUseCase = OneRepMaxUseCase(oneRepMaxRepository,workoutRepository)
 
-    val authRepository :AuthRepository=remember {
+    val authRepository : AuthRepository =remember {
         AuthRepositoryImpl(
             auth = supabase.auth
         )

@@ -18,7 +18,7 @@ import java.time.ZoneId
 data class GroupedWorkout(
     val exercise: ExerciseEntity,
     val sets: List<WorkoutEntryEntity>,
-    val changePercent: Double? = null
+    val changePercent: Float? = null
 )
 
 class HomeViewModel(
@@ -35,7 +35,15 @@ class HomeViewModel(
     private var workoutJob: Job? = null
 
     init {
-        onEvent(HomeEvent.OnDateSelected(LocalDate.now()))
+        val today = LocalDate.now()
+        onEvent(HomeEvent.OnDateSelected(today))
+        
+        // Dynamic Updates: Listen for changes in the repository and refresh current view
+        viewModelScope.launch {
+            oneRepMaxRepository.updates.collect {
+                _state.value.selectedDateMillis?.let { observeWorkoutsForDate(it) }
+            }
+        }
     }
 
     fun onEvent(event: HomeEvent) {
@@ -59,7 +67,7 @@ class HomeViewModel(
                 viewModelScope.launch {
                     _uiEvent.emit(
                         HomeUiEvent.NavigateToExerciseSelection(
-                            dateMillis = _state.value.selectedDateMillis ?: System.currentTimeMillis() // ✅
+                            dateMillis = _state.value.selectedDateMillis ?: System.currentTimeMillis()
                         )
                     )
                 }
@@ -69,26 +77,19 @@ class HomeViewModel(
                     _uiEvent.emit(
                         HomeUiEvent.NavigateToLogWorkout(
                             exercise = event.exercise,
-                            dateMillis = _state.value.selectedDateMillis ?: System.currentTimeMillis() // ✅
+                            dateMillis = _state.value.selectedDateMillis ?: System.currentTimeMillis()
                         )
                     )
                 }
             }
             is HomeEvent.RefreshWorkouts -> {
-                // Refresh workouts for the currently selected date
-                val dateMillis = _state.value.selectedDateMillis
-                if (dateMillis != null) {
-                    observeWorkoutsForDate(dateMillis)
-                }
+                refresh()
             }
         }
     }
 
     fun refresh() {
-        val dateMillis = _state.value.selectedDateMillis
-        if (dateMillis != null) {
-            observeWorkoutsForDate(dateMillis)
-        }
+        _state.value.selectedDateMillis?.let { observeWorkoutsForDate(it) }
     }
 
     private fun observeWorkoutsForDate(dateMillis: Long) {
@@ -121,7 +122,7 @@ class HomeViewModel(
                                     userId = workoutWithExercise.userId
                                 )
                             },
-                            changePercent = oneRMMap[exerciseId]?.changePercent?.toDouble()
+                            changePercent = oneRMMap[exerciseId]?.changePercent?.toFloat()
                         )
                     }
 

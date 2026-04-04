@@ -1,9 +1,10 @@
 package com.ghostbug.heavyLifts.di
 
-import AuthRepository
+
 import android.content.Context
 import com.ghostbug.heavyLifts.BuildConfig
 import com.ghostbug.heavyLifts.data.UseCase.OneRepMaxUseCase
+import com.ghostbug.heavyLifts.data.repository.AuthRepository
 import com.ghostbug.heavyLifts.data.repository.AuthRepositoryImpl
 
 
@@ -36,5 +37,5 @@ class AppContainer(context: Context) {
     val exerciseRepository: ExerciseRepository = ExerciseRepositoryImpl(supabase.postgrest, supabase.auth)
     val workoutRepository: WorkoutRepository = WorkoutRepositoryImpl(supabase.postgrest, supabase.auth)
     val oneRepMaxRepository: OneRepMaxRepository = OneRepMaxRepositoryImpl(supabase.postgrest, supabase.auth)
-    val oneRepMaxUseCase = OneRepMaxUseCase(oneRepMaxRepository)
+    val oneRepMaxUseCase = OneRepMaxUseCase(oneRepMaxRepository, workoutRepository)
 }

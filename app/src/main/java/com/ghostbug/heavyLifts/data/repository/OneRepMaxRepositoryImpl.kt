@@ -9,68 +9,83 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
+import java.time.Instant
+import java.time.ZoneId
 
 class OneRepMaxRepositoryImpl(
-   private val postgrest: Postgrest,
-   private val auth: Auth
+    private val postgrest: Postgrest,
+    private val auth: Auth
 ) : OneRepMaxRepository {
+
+    private companion object {
+        const val TABLE_ONE_REP_MAX = "one_rep_max"
+    }
+
+    private val _updates = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    override val updates: SharedFlow<Unit> = _updates.asSharedFlow()
 
     private val currentUserId: String?
         get() = auth.currentUserOrNull()?.id
 
+    private suspend fun notifyUpdate() {
+        _updates.emit(Unit)
+    }
+
     override suspend fun insert(entity: OneRepMaxEntity) {
         val userId = currentUserId ?: return
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             val dto = entity.toDto().copy(userId = userId)
-            postgrest.from("one_rep_max")
-                .insert(dto)
+            postgrest.from(TABLE_ONE_REP_MAX).insert(dto)
+            notifyUpdate()
         }
     }
 
     override suspend fun getChangePercentageForDate(exerciseId: Int, date: Long): Double? {
         val userId = currentUserId ?: return null
-        return withContext(Dispatchers.IO){
-            // Use YYYY-MM-DD format for consistent filtering
-            val dateString = LocalDate.ofEpochDay(date / 86400000).toString()
-
-            val result = postgrest.from("one_rep_max")
+        return withContext(Dispatchers.IO) {
+            val (startOfDay, endOfDay) = getDateRange(date)
+            postgrest.from(TABLE_ONE_REP_MAX)
                 .select(Columns.list("change_percent")) {
                     filter {
                         eq("user_id", userId)
                         eq("exercise_id", exerciseId)
-                        eq("date", dateString)
+                        gte("date", startOfDay)
+                        lt("date", endOfDay)
                     }
                     limit(1)
                 }
                 .decodeSingleOrNull<OneRepMaxEntityDto>()
-            result?.changePercent?.toDouble()
+                ?.changePercent?.toDouble()
         }
     }
 
     override suspend fun getOneRepMaxForDate(date: Long): List<OneRepMaxEntity> {
         val userId = currentUserId ?: return emptyList()
-        return withContext(Dispatchers.IO){
-            // Use YYYY-MM-DD format for consistent filtering
-            val dateString = LocalDate.ofEpochDay(date / 86400000).toString()
-
-            val result = postgrest.from("one_rep_max")
+        return withContext(Dispatchers.IO) {
+            val (startOfDay, endOfDay) = getDateRange(date)
+            postgrest.from(TABLE_ONE_REP_MAX)
                 .select {
                     filter {
                         eq("user_id", userId)
-                        eq("date", dateString)
+                        and {
+                            gte("date", startOfDay)
+                            lt("date", endOfDay)
+                        }
                     }
                 }
                 .decodeList<OneRepMaxEntityDto>()
-            result.map { it.toDomain() }
+                .map { it.toDomain() }
         }
     }
 
     override suspend fun getLatest(exerciseId: Int): OneRepMaxEntity? {
         val userId = currentUserId ?: return null
         return withContext(Dispatchers.IO) {
-            val result = postgrest.from("one_rep_max")
+            postgrest.from(TABLE_ONE_REP_MAX)
                 .select {
                     filter {
                         eq("user_id", userId)
@@ -80,45 +95,120 @@ class OneRepMaxRepositoryImpl(
                     limit(1)
                 }
                 .decodeSingleOrNull<OneRepMaxEntityDto>()
-            result?.toDomain()
+                ?.toDomain()
         }
     }
 
-    override suspend fun getPrevious(exerciseId: Int, date: Long): OneRepMaxEntity? {
+    override suspend fun getPersonalBestBefore(exerciseId: Int, date: Long): OneRepMaxEntity? {
         val userId = currentUserId ?: return null
         return withContext(Dispatchers.IO) {
-            // Use YYYY-MM-DD format for consistent filtering
-            val dateString = LocalDate.ofEpochDay(date / 86400000).toString()
-
-            val result = postgrest.from("one_rep_max")
+            val (startOfDay, _) = getDateRange(date)
+            postgrest.from(TABLE_ONE_REP_MAX)
                 .select {
                     filter {
                         eq("user_id", userId)
                         eq("exercise_id", exerciseId)
-                        lt("date", dateString)
+                        lt("date", startOfDay)
                     }
-                    order("date", Order.DESCENDING)
+                    order("curr_1rm", Order.DESCENDING)
                     limit(1)
                 }
                 .decodeSingleOrNull<OneRepMaxEntityDto>()
-            result?.toDomain()
+                ?.toDomain()
+        }
+    }
+
+    override suspend fun getNext(exerciseId: Int, date: Long): OneRepMaxEntity? {
+        val userId = currentUserId ?: return null
+        return withContext(Dispatchers.IO) {
+            val (_, endOfDay) = getDateRange(date)
+            postgrest.from(TABLE_ONE_REP_MAX)
+                .select {
+                    filter {
+                        eq("user_id", userId)
+                        eq("exercise_id", exerciseId)
+                        gte("date", endOfDay)
+                    }
+                    order("date", Order.ASCENDING)
+                    limit(1)
+                }
+                .decodeSingleOrNull<OneRepMaxEntityDto>()
+                ?.toDomain()
         }
     }
 
     override suspend fun deleteOneRepMax(exerciseId: Int, date: Long) {
         val userId = currentUserId ?: return
         withContext(Dispatchers.IO) {
-            // Use YYYY-MM-DD format for consistent filtering
-            val dateString = LocalDate.ofEpochDay(date / 86400000).toString()
-
-            postgrest.from("one_rep_max")
+            val (startOfDay, endOfDay) = getDateRange(date)
+            postgrest.from(TABLE_ONE_REP_MAX)
                 .delete {
                     filter {
                         eq("user_id", userId)
                         eq("exercise_id", exerciseId)
-                        eq("date", dateString)
+                        and {
+                            gte("date", startOfDay)
+                            lt("date", endOfDay)
+                        }
                     }
                 }
+            notifyUpdate()
         }
+    }
+
+    override suspend fun deleteByExercise(exerciseId: Int) {
+        val userId = currentUserId ?: return
+        withContext(Dispatchers.IO) {
+            postgrest.from(TABLE_ONE_REP_MAX)
+                .delete {
+                    filter {
+                        eq("user_id", userId)
+                        eq("exercise_id", exerciseId)
+                    }
+                }
+            notifyUpdate()
+        }
+    }
+
+    override suspend fun update(entity: OneRepMaxEntity) {
+        val userId = currentUserId ?: return
+        withContext(Dispatchers.IO) {
+            val dto = entity.toDto().copy(userId = userId)
+            postgrest.from(TABLE_ONE_REP_MAX).update(dto) {
+                filter {
+                    eq("user_id", userId)
+                    eq("id", entity.id)
+                }
+            }
+            notifyUpdate()
+        }
+    }
+
+    override suspend fun getByDate(exerciseId: Int, date: Long): OneRepMaxEntity? {
+        val userId = currentUserId ?: return null
+        return withContext(Dispatchers.IO) {
+            val (startOfDay, endOfDay) = getDateRange(date)
+            postgrest.from(TABLE_ONE_REP_MAX)
+                .select {
+                    filter {
+                        eq("user_id", userId)
+                        eq("exercise_id", exerciseId)
+                        and {
+                            gte("date", startOfDay)
+                            lt("date", endOfDay)
+                        }
+                    }
+                    limit(1)
+                }
+                .decodeSingleOrNull<OneRepMaxEntityDto>()
+                ?.toDomain()
+        }
+    }
+
+    private fun getDateRange(date: Long): Pair<String, String> {
+        val localDate = Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate()
+        val startOfDay = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toString()
+        val endOfDay = localDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toString()
+        return Pair(startOfDay, endOfDay)
     }
 }

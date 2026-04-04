@@ -1,9 +1,10 @@
 package com.ghostbug.heavyLifts.ui.screen.signIn
 
-import AuthRepository
+
 import SignInViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.ghostbug.heavyLifts.data.repository.AuthRepository
 
 class SignInViewModelFactory(
     private val authRepository: AuthRepository

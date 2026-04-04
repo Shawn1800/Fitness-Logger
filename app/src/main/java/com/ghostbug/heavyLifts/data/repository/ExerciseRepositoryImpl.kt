@@ -1,6 +1,5 @@
 package com.ghostbug.heavyLifts.data.repository
 
-
 import com.ghostbug.heavyLifts.data.domain.ExerciseEntity
 import com.ghostbug.heavyLifts.data.remote.dto.ExerciseEntityDto
 import io.github.jan.supabase.auth.Auth
@@ -13,53 +12,49 @@ class ExerciseRepositoryImpl(
     private val auth: Auth,
 ) : ExerciseRepository {
 
+    private companion object {
+        const val TABLE_EXERCISES = "exercises"
+    }
+
     override suspend fun insertExercises(exercises: List<ExerciseEntity>) {
         withContext(Dispatchers.IO) {
-            val dto = exercises.map {
-                ExerciseEntityDto(
-                    id = it.id,
-                    exerciseName = it.exerciseName,
-                    category = it.category
-                )
-            }
-            postgrest.from("exercises")
-                .insert(dto)
+            val dtos = exercises.map { it.toDto() }
+            postgrest.from(TABLE_EXERCISES).insert(dtos)
         }
     }
 
-
     override suspend fun getAllExercises(): List<ExerciseEntity> {
         return withContext(Dispatchers.IO) {
-            val result = postgrest.from("exercises")
+            postgrest.from(TABLE_EXERCISES)
                 .select()
                 .decodeList<ExerciseEntityDto>()
-            result.map { it.toDomain() }
+                .map { it.toDomain() }
         }
     }
 
     override suspend fun searchExercises(query: String): List<ExerciseEntity> {
         return withContext(Dispatchers.IO) {
-            val result = postgrest.from("exercises")
+            postgrest.from(TABLE_EXERCISES)
                 .select {
                     filter {
                         ilike("exercise_name", "%$query%")
                     }
                 }
                 .decodeList<ExerciseEntityDto>()
-            result.map { it.toDomain() }
+                .map { it.toDomain() }
         }
     }
 
     override suspend fun getExerciseByCategory(category: String): List<ExerciseEntity> {
         return withContext(Dispatchers.IO) {
-            val result = postgrest.from("exercises")
-                .select{
+            postgrest.from(TABLE_EXERCISES)
+                .select {
                     filter {
                         eq("category", category)
                     }
                 }
                 .decodeList<ExerciseEntityDto>()
-             result.map { it.toDomain() }
+                .map { it.toDomain() }
         }
     }
 
@@ -67,8 +62,8 @@ class ExerciseRepositoryImpl(
         query: String,
         category: String
     ): List<ExerciseEntity> {
-       return withContext(Dispatchers.IO) {
-            val result = postgrest.from("exercises")
+        return withContext(Dispatchers.IO) {
+            postgrest.from(TABLE_EXERCISES)
                 .select {
                     filter {
                         eq("category", category)
@@ -76,12 +71,20 @@ class ExerciseRepositoryImpl(
                     }
                 }
                 .decodeList<ExerciseEntityDto>()
-           result.map { it.toDomain() }
+                .map { it.toDomain() }
         }
     }
 
     private fun ExerciseEntityDto.toDomain(): ExerciseEntity {
         return ExerciseEntity(
+            id = id,
+            exerciseName = exerciseName,
+            category = category
+        )
+    }
+
+    private fun ExerciseEntity.toDto(): ExerciseEntityDto {
+        return ExerciseEntityDto(
             id = id,
             exerciseName = exerciseName,
             category = category

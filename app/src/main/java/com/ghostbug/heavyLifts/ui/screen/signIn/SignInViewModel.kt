@@ -1,7 +1,7 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ghostbug.heavyLifts.ui.screen.signIn.SignInEvent
-import AuthRepository
+import com.ghostbug.heavyLifts.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
