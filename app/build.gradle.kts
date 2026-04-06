@@ -1,21 +1,27 @@
 
 import com.android.build.api.dsl.ApplicationExtension
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
     kotlin("plugin.serialization") version "2.3.10"
-
 }
 
+// Load properties from local.properties or gradle.properties
+val props = Properties()
+val localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.inputStream().use { props.load(it) }
+}
 
 extensions.configure<ApplicationExtension>  {
     namespace = "com.ghostbug.heavyLifts"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.ghostbug.heavyLifts"
+        applicationId = "com.ghostbug.heavyliftsapp"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -23,13 +29,20 @@ extensions.configure<ApplicationExtension>  {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "SUPABASE_URL", "\"https://zuhhteysfliayqxvruaw.supabase.co\"")
-        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"sb_publishable_yWxEUoNBT-wX3R-H0Fs8QA_fgaFntw-\"")
+        val supabaseUrl = props.getProperty("SUPABASE_URL") ?: ""
+        val supabaseKey = props.getProperty("SUPABASE_PUBLISHABLE_KEY") ?: ""
+        val googleClientId = props.getProperty("GOOGLE_CLIENT_ID") ?: ""
+
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"$supabaseKey\"")
+        buildConfigField("String", "GOOGLE_CLIENT_ID", "\"$googleClientId\"")
+
+
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -45,7 +58,6 @@ extensions.configure<ApplicationExtension>  {
         compose = true
         buildConfig = true
     }
-
 
     configurations.all {
         resolutionStrategy {
@@ -83,11 +95,9 @@ dependencies {
     implementation(libs.androidx.material3.adaptive.navigation3)
     implementation(libs.kotlinx.serialization.core)
 
-
-
     implementation("com.google.android.gms:play-services-auth:21.5.1")
-    implementation("androidx.credentials:credentials:1.5.0")
-    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+    implementation("androidx.credentials:credentials:1.6.0-rc02")
+    implementation("androidx.credentials:credentials-play-services-auth:1.6.0-rc02")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.2.0")
 
     implementation(platform("io.github.jan-tennert.supabase:bom:3.4.1"))
@@ -95,6 +105,5 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:auth-kt")
 
     implementation("io.ktor:ktor-client-android:3.4.1")
-
-
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 }

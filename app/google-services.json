@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:850847731559:android:3d096133c0ab95d59329c2",
         "android_client_info": {
-          "package_name": "com.example.demo103"
+          "package_name": ""
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "850847731559-5c4nofpfuhm96mmf52a0ppm83gt9463h.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.demo103",
+            "package_name": "com.ghostbug.heavyliftsapp",
             "certificate_hash": "25b4bc6dcc94e8261acb7a1d09961c11f80afd99"
           }
         },
@@ -46,7 +46,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:850847731559:android:e7a3d97d86c969829329c2",
         "android_client_info": {
-          "package_name": "com.ghostbug.heavyLifts"
+          "package_name": "com.ghostbug.heavyliftsapp"
         }
       },
       "oauth_client": [

@@ -8,7 +8,7 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.ghostbug.heavyLifts" />
+                  <option name="appId" value="com.ghostbug.heavyliftsapp" />
                   <option name="mobileSdkAppId" value="1:850847731559:android:e7a3d97d86c969829329c2" />
                   <option name="projectId" value="heavylifts-70aea" />
                   <option name="projectNumber" value="850847731559" />

@@ -1,21 +1,27 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Supabase and Ktor ProGuard Rules
+-keep class io.github.jan.supabase.** { *; }
+-keep class io.ktor.** { *; }
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Kotlin Serialization
+-keepattributes *Annotation*, EnclosingMethod, Signature, InnerClasses
+-keep class kotlinx.serialization.** { *; }
+-keepclassmembers class * {
+    @kotlinx.serialization.Serializable *;
+}
+-keepclassmembers class * {
+    @kotlinx.serialization.SerialName *;
+}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Preserve DTOs for Supabase decoding
+-keep class com.ghostbug.heavyliftsapp.data.remote.dto.** { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# AndroidX Credentials & Google ID
+-keep class androidx.credentials.** { *; }
+-keep class com.google.android.libraries.identity.googleid.** { *; }
+
+# Material 3 and Compose
+-keep class androidx.compose.material3.** { *; }
+
+# Fix R8 missing classes for java.lang.management (often caused by Ktor or other libraries using ManagementFactory)
+-dontwarn java.lang.management.ManagementFactory
+-dontwarn java.lang.management.RuntimeMXBean
