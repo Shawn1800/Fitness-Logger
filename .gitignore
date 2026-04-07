@@ -13,6 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
+app/build
+*.apk
+*.aab
+*.apks
 
 # Secrets and local config
 secrets.properties
@@ -31,3 +35,5 @@ app-release.aab
 
 # Kotlin
 .kotlin
+
+
