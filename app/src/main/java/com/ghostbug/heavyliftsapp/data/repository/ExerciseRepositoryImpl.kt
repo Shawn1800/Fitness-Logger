@@ -2,6 +2,8 @@ package com.ghostbug.heavyliftsapp.data.repository
 
 import com.ghostbug.heavyliftsapp.data.domain.ExerciseEntity
 import com.ghostbug.heavyliftsapp.data.remote.dto.ExerciseEntityDto
+import com.ghostbug.heavyliftsapp.data.remote.dto.toDomain
+import com.ghostbug.heavyliftsapp.data.remote.dto.toDto
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.coroutines.Dispatchers
@@ -75,19 +77,18 @@ class ExerciseRepositoryImpl(
         }
     }
 
-    private fun ExerciseEntityDto.toDomain(): ExerciseEntity {
-        return ExerciseEntity(
-            id = id,
-            exerciseName = exerciseName,
-            category = category
-        )
+    override suspend fun getExerciseById(id: Long): ExerciseEntity? {
+        return withContext(Dispatchers.IO) {
+            postgrest.from(TABLE_EXERCISES)
+                .select {
+                    filter {
+                        eq("id", id)
+                    }
+                }
+                .decodeSingleOrNull<ExerciseEntityDto>()
+                ?.toDomain()
+        }
     }
 
-    private fun ExerciseEntity.toDto(): ExerciseEntityDto {
-        return ExerciseEntityDto(
-            id = id,
-            exerciseName = exerciseName,
-            category = category
-        )
-    }
+
 }

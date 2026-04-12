@@ -10,31 +10,27 @@ class OneRepMaxUseCase(
     private val workoutRepository: WorkoutRepository
 ) {
     suspend operator fun invoke(
-        exerciseId: Int,
+        exerciseId: Long,
         date: Long,
         sets: List<WorkoutEntryEntity>
     ) {
-        // 1. Rebuild the entire timeline for this exercise
+
         recalculateTimeline(exerciseId)
     }
 
-    private suspend fun recalculateTimeline(exerciseId: Int) {
-        // Get ALL workout sessions for this exercise
+    private suspend fun recalculateTimeline(exerciseId: Long) {
+
         val allWorkouts = workoutRepository.getWorkoutsByExercise(exerciseId)
-        
-        // If NO workouts exist at all for this exercise, delete all 1RM history for it
         if (allWorkouts.isEmpty()) {
             oneRepMaxRepository.deleteByExercise(exerciseId)
             return
         }
-
-        // Group by date
         val sessionsByDate = allWorkouts.groupBy { 
             val instant = java.time.Instant.ofEpochMilli(it.date)
             instant.atZone(java.time.ZoneId.systemDefault()).toLocalDate()
         }.toSortedMap()
 
-        // Clear existing 1RM history for this exercise to start fresh
+
         oneRepMaxRepository.deleteByExercise(exerciseId)
 
         var runningPersonalBest = 0.0f
@@ -62,7 +58,6 @@ class OneRepMaxUseCase(
             }
         }
     }
-
     private fun calculate1RM(weight: Float, reps: Int): Float {
         if (reps == 1) return weight
         return if (reps > 0) weight * (1 + reps / 30f) else weight

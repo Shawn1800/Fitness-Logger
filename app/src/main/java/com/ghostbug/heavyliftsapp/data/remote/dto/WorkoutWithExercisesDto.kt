@@ -4,42 +4,35 @@ import com.ghostbug.heavyliftsapp.data.domain.ExerciseEntity
 import com.ghostbug.heavyliftsapp.data.domain.WorkoutWithExercise
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.Instant
 import java.time.OffsetDateTime
+import kotlin.time.Instant
 
 
 @Serializable
 data class WorkoutWithExerciseDto(
-    @SerialName("id") val id: Int,
-    @SerialName("weight") val weight: Double,
+    @SerialName("id") val id: Long,
+    @SerialName("weight") val weight: Float,
     @SerialName("reps") val reps: Int,
     @SerialName("sets") val sets: Int,
-    @SerialName("date") val date: String,
+    @SerialName("date") val date: Instant,
+    @SerialName("user_id") val userId: String,
     @SerialName("exercises") val exercise: ExerciseEntityDto
 )
 
 fun WorkoutWithExerciseDto.toDomain(): WorkoutWithExercise {
-    val millis = try {
-        Instant.parse(date).toEpochMilli()
-    } catch (e: Exception) {
-        try {
-            OffsetDateTime.parse(date).toInstant().toEpochMilli()
-        } catch (e2: Exception) {
-            0L
-        }
-    }
+
     return WorkoutWithExercise(
         id = id,
         weight = weight,
         reps = reps,
         sets = sets,
-        date = millis,
+        date = date.toEpochMilliseconds(),
         exercise = ExerciseEntity(
             id = exercise.id,
             exerciseName = exercise.exerciseName,
             category = exercise.category,
-//            userId = exercise.userId
+
         ),
-        userId = ""
+        userId = userId
     )
 }

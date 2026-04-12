@@ -12,4 +12,6 @@ interface ExerciseRepository {
     suspend fun getExerciseByCategory(category: String): List<ExerciseEntity>
 
     suspend fun searchExerciseByCategory(query: String, category: String): List<ExerciseEntity>
+
+    suspend fun getExerciseById(id: Long): ExerciseEntity?
 }

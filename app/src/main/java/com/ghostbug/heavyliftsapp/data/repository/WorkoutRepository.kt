@@ -8,9 +8,9 @@ interface WorkoutRepository {
     
     suspend fun getWorkoutByDate(date: Long): List<WorkoutWithExercise>
     
-    suspend fun deleteSetById(id: Int)
+    suspend fun deleteSetById(id: Long)
     
-    suspend fun getWorkoutByExerciseAndDate(exerciseId: Int, date: Long): List<WorkoutEntryEntity>
+    suspend fun getWorkoutByExerciseAndDate(exerciseId: Long, date: Long): List<WorkoutEntryEntity>
 
-    suspend fun getWorkoutsByExercise(exerciseId: Int): List<WorkoutEntryEntity>
+    suspend fun getWorkoutsByExercise(exerciseId: Long): List<WorkoutEntryEntity>
 }

@@ -44,7 +44,7 @@ class OneRepMaxRepositoryImpl(
         }
     }
 
-    override suspend fun getChangePercentageForDate(exerciseId: Int, date: Long): Double? {
+    override suspend fun getChangePercentageForDate(exerciseId: Long, date: Long): Double? {
         val userId = currentUserId ?: return null
         return withContext(Dispatchers.IO) {
             val (startOfDay, endOfDay) = getDateRange(date)
@@ -82,7 +82,7 @@ class OneRepMaxRepositoryImpl(
         }
     }
 
-    override suspend fun getLatest(exerciseId: Int): OneRepMaxEntity? {
+    override suspend fun getLatest(exerciseId: Long): OneRepMaxEntity? {
         val userId = currentUserId ?: return null
         return withContext(Dispatchers.IO) {
             postgrest.from(TABLE_ONE_REP_MAX)
@@ -99,7 +99,7 @@ class OneRepMaxRepositoryImpl(
         }
     }
 
-    override suspend fun getPersonalBestBefore(exerciseId: Int, date: Long): OneRepMaxEntity? {
+    override suspend fun getPersonalBestBefore(exerciseId: Long, date: Long): OneRepMaxEntity? {
         val userId = currentUserId ?: return null
         return withContext(Dispatchers.IO) {
             val (startOfDay, _) = getDateRange(date)
@@ -118,7 +118,7 @@ class OneRepMaxRepositoryImpl(
         }
     }
 
-    override suspend fun getNext(exerciseId: Int, date: Long): OneRepMaxEntity? {
+    override suspend fun getNext(exerciseId: Long, date: Long): OneRepMaxEntity? {
         val userId = currentUserId ?: return null
         return withContext(Dispatchers.IO) {
             val (_, endOfDay) = getDateRange(date)
@@ -137,7 +137,7 @@ class OneRepMaxRepositoryImpl(
         }
     }
 
-    override suspend fun deleteOneRepMax(exerciseId: Int, date: Long) {
+    override suspend fun deleteOneRepMax(exerciseId: Long, date: Long) {
         val userId = currentUserId ?: return
         withContext(Dispatchers.IO) {
             val (startOfDay, endOfDay) = getDateRange(date)
@@ -156,7 +156,7 @@ class OneRepMaxRepositoryImpl(
         }
     }
 
-    override suspend fun deleteByExercise(exerciseId: Int) {
+    override suspend fun deleteByExercise(exerciseId: Long) {
         val userId = currentUserId ?: return
         withContext(Dispatchers.IO) {
             postgrest.from(TABLE_ONE_REP_MAX)
@@ -184,7 +184,7 @@ class OneRepMaxRepositoryImpl(
         }
     }
 
-    override suspend fun getByDate(exerciseId: Int, date: Long): OneRepMaxEntity? {
+    override suspend fun getByDate(exerciseId: Long, date: Long): OneRepMaxEntity? {
         val userId = currentUserId ?: return null
         return withContext(Dispatchers.IO) {
             val (startOfDay, endOfDay) = getDateRange(date)

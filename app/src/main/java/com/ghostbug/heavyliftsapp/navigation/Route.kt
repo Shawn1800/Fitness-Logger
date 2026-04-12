@@ -1,7 +1,6 @@
 package com.ghostbug.heavyliftsapp.navigation
 
 import androidx.navigation3.runtime.NavKey
-import com.ghostbug.heavyliftsapp.data.domain.ExerciseEntity
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,6 +17,13 @@ sealed interface Route : NavKey {
     @Serializable
     data object ExerciseScreen : Route , NavKey
     @Serializable
-    data class LogWorkoutScreen (val exercise: ExerciseEntity, val dateMillis: Long) : Route , NavKey
+    data class LogWorkoutScreen (val exerciseId: Long, val dateMillis: Long) : Route , NavKey
+
+    @Serializable
+    data object UserProfileScreen1 : Route , NavKey
+        @Serializable
+    data object UserProfileScreen2 : Route , NavKey
+    @Serializable
+    data object UserProfileScreen3 : Route , NavKey
 
 }

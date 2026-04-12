@@ -106,4 +106,9 @@ dependencies {
 
     implementation("io.ktor:ktor-client-android:3.4.1")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+
+
+        implementation("io.coil-kt:coil-compose:2.6.0")
+
 }

@@ -8,21 +8,21 @@ interface OneRepMaxRepository {
 
     suspend fun insert(entity: OneRepMaxEntity)
 
-    suspend fun getChangePercentageForDate(exerciseId: Int, date: Long): Double?
+    suspend fun getChangePercentageForDate(exerciseId: Long, date: Long): Double?
 
     suspend fun getOneRepMaxForDate(date: Long): List<OneRepMaxEntity>
 
-    suspend fun getLatest(exerciseId: Int): OneRepMaxEntity?
+    suspend fun getLatest(exerciseId: Long): OneRepMaxEntity?
 
-    suspend fun getPersonalBestBefore(exerciseId: Int, date: Long): OneRepMaxEntity?
+    suspend fun getPersonalBestBefore(exerciseId: Long, date: Long): OneRepMaxEntity?
     
-    suspend fun getNext(exerciseId: Int, date: Long): OneRepMaxEntity?
+    suspend fun getNext(exerciseId: Long, date: Long): OneRepMaxEntity?
 
-    suspend fun deleteOneRepMax(exerciseId: Int, date: Long)
+    suspend fun deleteOneRepMax(exerciseId: Long, date: Long)
     
-    suspend fun deleteByExercise(exerciseId: Int)
+    suspend fun deleteByExercise(exerciseId: Long)
     
     suspend fun update(entity: OneRepMaxEntity)
 
-    suspend fun getByDate(exerciseId: Int, date: Long): OneRepMaxEntity?
+    suspend fun getByDate(exerciseId: Long, date: Long): OneRepMaxEntity?
 }

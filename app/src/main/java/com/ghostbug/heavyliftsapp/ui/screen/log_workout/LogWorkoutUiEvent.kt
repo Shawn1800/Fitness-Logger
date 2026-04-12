@@ -1,6 +1,0 @@
-package com.ghostbug.heavyliftsapp.ui.screen.log_workout
-
-sealed interface LogWorkoutUiEvent {
-    data class SendSnackbar(val message:String) : LogWorkoutUiEvent
-    object  NavBackToHome: LogWorkoutUiEvent
-}

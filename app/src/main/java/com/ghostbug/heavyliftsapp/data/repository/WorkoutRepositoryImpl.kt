@@ -61,7 +61,7 @@ class WorkoutRepositoryImpl(
         }
     }
 
-    override suspend fun deleteSetById(id: Int) {
+    override suspend fun deleteSetById(id: Long) {
         val userId = currentUserId ?: return
         withContext(Dispatchers.IO) {
             postgrest.from(TABLE_WORKOUT_ENTRIES)
@@ -75,7 +75,7 @@ class WorkoutRepositoryImpl(
     }
 
     override suspend fun getWorkoutByExerciseAndDate(
-        exerciseId: Int,
+        exerciseId: Long,
         date: Long
     ): List<WorkoutEntryEntity> {
         val userId = currentUserId ?: return emptyList()
@@ -99,7 +99,7 @@ class WorkoutRepositoryImpl(
         }
     }
 
-    override suspend fun getWorkoutsByExercise(exerciseId: Int): List<WorkoutEntryEntity> {
+    override suspend fun getWorkoutsByExercise(exerciseId: Long): List<WorkoutEntryEntity> {
         val userId = currentUserId ?: return emptyList()
         return withContext(Dispatchers.IO) {
             postgrest.from(TABLE_WORKOUT_ENTRIES)

@@ -2,10 +2,10 @@ package com.ghostbug.heavyliftsapp.data.domain
 
 import kotlinx.serialization.Serializable
 
-@Serializable
+
 data class WorkoutWithExercise(
-    val id: Int,
-    val weight: Double,
+    val id: Long,
+    val weight: Float,
     val reps: Int,
     val sets: Int,
     val date: Long,
