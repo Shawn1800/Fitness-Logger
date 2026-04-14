@@ -19,13 +19,14 @@ if (localPropsFile.exists()) {
 extensions.configure<ApplicationExtension>  {
     namespace = "com.ghostbug.heavyLifts"
     compileSdk = 36
+    compileSdkExtension = 19
 
     defaultConfig {
         applicationId = "com.ghostbug.heavyliftsapp"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -42,7 +43,7 @@ extensions.configure<ApplicationExtension>  {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -111,4 +112,5 @@ dependencies {
 
         implementation("io.coil-kt:coil-compose:2.6.0")
 
+    implementation("androidx.health.connect:connect-client:1.2.0-alpha03")
 }
