@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
     kotlin("plugin.serialization") version "2.3.10"
+
+
 }
 
 // Load properties from local.properties or gradle.properties
@@ -113,4 +115,8 @@ dependencies {
         implementation("io.coil-kt:coil-compose:2.6.0")
 
     implementation("androidx.health.connect:connect-client:1.2.0-alpha03")
+
+    implementation("com.google.android.gms:play-services-fitness:21.2.0")
+    implementation("androidx.work:work-runtime-ktx:2.11.2")
 }
+

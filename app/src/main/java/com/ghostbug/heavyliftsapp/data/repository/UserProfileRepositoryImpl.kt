@@ -44,20 +44,31 @@ class UserProfileRepositoryImpl(
     }
 
     override suspend fun upsertProfile(profile: UserProfileEntity) {
-        val uid = currentUserId ?: throw Exception("❌ User not authenticated. Cannot save profile. Auth user ID is null.")
+        val uid = currentUserId ?: throw Exception("Not authenticated")
         val dto = profile.toDto().copy(userId = uid)
         withContext(Dispatchers.IO) {
-            try {
-                println("📤 Uploading profile for user: $uid")
+            val exists = postgrest.from(TABLE_USER_PROFILE)
+                .select { filter { eq("user_id", uid) } }
+                .decodeList<UserProfileEntityDto>()
+                .isNotEmpty()
+
+            if (exists) {
                 postgrest.from(TABLE_USER_PROFILE)
-                    .upsert(dto) {
-                        onConflict = "user_id"
+                    .update(dto) {
+                        filter { eq("user_id", uid) }
                     }
-                println("✅ Profile saved successfully for user: $uid")
-            } catch (e: Exception) {
-                println("❌ Error upserting profile: ${e.message}")
-                println("❌ Full error: ${e.stackTraceToString()}")
-                throw e
+            } else {
+                postgrest.from(TABLE_USER_PROFILE)
+                    .insert(dto)
+            }
+        }
+    }
+
+    override suspend fun deleteOwnProfile() {
+        val uid = currentUserId ?: return
+        withContext(Dispatchers.IO) {
+            postgrest.from(TABLE_USER_PROFILE).delete {
+                filter { eq("user_id", uid) }
             }
         }
     }

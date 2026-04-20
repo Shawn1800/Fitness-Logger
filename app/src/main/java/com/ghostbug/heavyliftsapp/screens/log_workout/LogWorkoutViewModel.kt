@@ -1,10 +1,7 @@
 package com.ghostbug.heavyliftsapp.screens.log_workout
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.savedstate.savedState
-import androidx.savedstate.serialization.encodeToSavedState
 import com.ghostbug.heavyliftsapp.data.UseCase.OneRepMaxUseCase
 import com.ghostbug.heavyliftsapp.data.domain.WorkoutEntryEntity
 import com.ghostbug.heavyliftsapp.data.repository.ExerciseRepository
@@ -34,34 +31,32 @@ class LogWorkoutViewModel(
     private val _state = MutableStateFlow(LogWorkoutState())
     val state: StateFlow<LogWorkoutState> = _state.asStateFlow()
 
-    private val _uiEvent = MutableSharedFlow<LogWorkoutUiEvent>()
+    private val _uiEvent = MutableSharedFlow<LogWorkoutUiEvent>(extraBufferCapacity = 1)
     val uiEvent: SharedFlow<LogWorkoutUiEvent> = _uiEvent.asSharedFlow()
+
+
 
     fun onEvent(event: LogWorkoutEvent) {
         when (event) {
-            is LogWorkoutEvent.OnAddingSets -> handleAddSet(event.exerciseId)
+            is LogWorkoutEvent.OnAddingSets -> handleAddSet(event.exerciseId, event.weight, event.reps)
             is LogWorkoutEvent.DeleteSet -> handleDeleteSet(event.id)
             is LogWorkoutEvent.UpdateReps -> handleUpdateReps(event.id, event.reps)
             is LogWorkoutEvent.UpdateWeight -> handleUpdateWeight(event.id, event.weight)
             is LogWorkoutEvent.SetExerciseById -> handleSetExerciseById(event)
-            is LogWorkoutEvent.SaveWorkout -> saveWorkout()
+            is LogWorkoutEvent.SaveWorkout -> saveWorkout(event.currentWeight, event.currentReps)
         }
     }
 
     private fun handleSetExerciseById(event: LogWorkoutEvent.SetExerciseById) {
+        // allow reload if the exercise or date changed (VM lives for Activity lifetime)
+        if (_state.value.exercise?.id == event.exerciseId && _state.value.dateMillis == event.dateMillis) return
         viewModelScope.launch {
             try {
                 val exercise = exerciseRepository.getExerciseById(event.exerciseId)
                 if (exercise != null) {
-                    _state.update { it.copy(exercise = exercise, dateMillis = event.dateMillis) }
-
                     val list = workoutRepository.getWorkoutByExerciseAndDate(event.exerciseId, event.dateMillis)
-                    _state.update { state ->
-                        state.copy(
-                            sets = list,
-                            editingWeights = list.associate { it.id to it.weight.toString() },
-                            editingReps = list.associate { it.id to it.reps.toString() }
-                        )
+                    _state.update {
+                        it.copy(exercise = exercise, dateMillis = event.dateMillis, sets = list)
                     }
                 } else {
                     sendSnackbar("Exercise not found")
@@ -75,9 +70,9 @@ class LogWorkoutViewModel(
 
     // ...existing code...
 
-    private fun handleAddSet(exerciseId: Long) {
-        val weight = _state.value.currentWeight.toDoubleOrNull()
-        val reps = _state.value.currentReps.toIntOrNull()
+    private fun handleAddSet(exerciseId: Long, weightStr: String, repsStr: String) {
+        val weight = weightStr.toDoubleOrNull()
+        val reps = repsStr.toIntOrNull()
 
         if (weight == null || reps == null || weight == 0.0 || reps == 0) {
             sendSnackbar("Enter valid weight and reps")
@@ -86,7 +81,7 @@ class LogWorkoutViewModel(
 
         _state.update { currentState ->
             val newSet = WorkoutEntryEntity(
-                id = -(currentState.sets.size + 1L), // Temporary ID
+                id = -(currentState.sets.size + 1L),
                 exerciseId = exerciseId,
                 weight = weight.toFloat(),
                 reps = reps,
@@ -94,11 +89,7 @@ class LogWorkoutViewModel(
                 date = System.currentTimeMillis(),
                 userId = ""
             )
-            currentState.copy(
-                currentWeight = "",
-                currentReps = "",
-                sets = currentState.sets + newSet
-            )
+            currentState.copy(sets = currentState.sets + newSet)
         }
     }
 
@@ -126,44 +117,22 @@ class LogWorkoutViewModel(
     }
 
     private fun handleUpdateReps(id: Long, reps: String) {
-        if (id == 0L) {
-            _state.update { it.copy(currentReps = reps) }
-        } else {
-            _state.update { currentState ->
-                currentState.copy(
-                    editingReps = currentState.editingReps + (id to reps),
-                    sets = currentState.sets.map {
-                        if (it.id == id) it.copy(reps = reps.toIntOrNull() ?: it.reps) else it
-                    }
-                )
-            }
-        }
+        // no-op: logged set text fields use local Compose state; not synced to VM
     }
 
     private fun handleUpdateWeight(id: Long, weight: String) {
-        if (id == 0L) {
-            _state.update { it.copy(currentWeight = weight) }
-        } else {
-            _state.update { currentState ->
-                currentState.copy(
-                    editingWeights = currentState.editingWeights + (id to weight),
-                    sets = currentState.sets.map {
-                        if (it.id == id) it.copy(weight = weight.toFloatOrNull() ?: it.weight) else it
-                    }
-                )
-            }
-        }
+        // no-op: logged set text fields use local Compose state; not synced to VM
     }
 
 
-    private fun saveWorkout() {
+    private fun saveWorkout(currentWeightStr: String = "", currentRepsStr: String = "") {
         viewModelScope.launch {
             val currentState = _state.value
             val dateToSave = getNormalizedDate(currentState.dateMillis)
-            
+
             var allSets = currentState.sets
-            val curWeight = currentState.currentWeight.toDoubleOrNull()
-            val curReps = currentState.currentReps.toIntOrNull()
+            val curWeight = currentWeightStr.toDoubleOrNull()
+            val curReps = currentRepsStr.toIntOrNull()
 
             if (curWeight != null && curReps != null && curWeight > 0 && curReps > 0) {
                 allSets = allSets + WorkoutEntryEntity(
@@ -196,29 +165,19 @@ class LogWorkoutViewModel(
                 if (newSets.isNotEmpty()) {
                     workoutRepository.insertWorkoutEntry(newSets)
                 }
-                val exerciseId= currentState.exercise?.id?: return@launch
-                val refreshed = workoutRepository.getWorkoutByExerciseAndDate(
-                   exerciseId,dateToSave
-                )
-
-                _state.update { 
-                    it.copy(sets = refreshed,
-                        editingWeights = refreshed.associate { it.id to it.weight.toString() },
-                        editingReps = refreshed.associate { it.id to it.reps.toString() },
-                        currentWeight = "",
-                        currentReps = "")
-                }
-
-
-                    // Sequentially calculate 1RM before navigating to ensure it's not cancelled
-                    oneRepMaxUseCase(exerciseId, dateToSave, refreshed)
-
-
-                _uiEvent.emit(LogWorkoutUiEvent.NavBackToHome)
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 sendSnackbar("Error saving: ${e.message}")
             }
+
+            // Always navigate — user must never be stuck on this screen
+            _uiEvent.emit(LogWorkoutUiEvent.NavBackToHome)
+
+            // 1RM recalc is best-effort — runs after navigation, never blocks save
+            try {
+                val exerciseId = currentState.exercise?.id ?: return@launch
+                oneRepMaxUseCase(exerciseId, dateToSave, allSets)
+            } catch (_: Exception) { }
         }
     }
 

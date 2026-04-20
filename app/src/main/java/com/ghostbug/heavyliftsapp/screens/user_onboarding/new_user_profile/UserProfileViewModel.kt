@@ -3,10 +3,19 @@ package com.ghostbug.heavyliftsapp.screens.user_onboarding.new_user_profile
 import HeightUnit
 import UserProfileState
 import WeightUnit
+import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_READ_HEALTH_DATA_HISTORY
+import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND
+import androidx.health.connect.client.records.ExerciseSessionRecord
+import androidx.health.connect.client.records.HeartRateRecord
+import androidx.health.connect.client.records.StepsRecord
+import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+
 import com.ghostbug.heavyliftsapp.data.domain.Gender
 import com.ghostbug.heavyliftsapp.data.domain.UserProfileEntity
+import com.ghostbug.heavyliftsapp.data.health.HealthConnectManager
 import com.ghostbug.heavyliftsapp.data.repository.UserProfileRepository
 import com.ghostbug.heavyliftsapp.screens.log_workout.LogWorkoutUiEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,8 +31,23 @@ import kotlinx.coroutines.*
 import kotlin.time.Clock
 
 class UserProfileViewModel(
-    val repository: UserProfileRepository
+    val repository: UserProfileRepository,
+    private val healthConnectManager: HealthConnectManager
 ) : ViewModel() {
+
+    val permissions = setOf(
+        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
+        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getWritePermission(StepsRecord::class),
+        HealthPermission.getReadPermission(StepsRecord::class),
+        HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
+        HealthPermission.getWritePermission(HeartRateRecord::class),
+
+        )
+
+    val backgroundReadPermissions = setOf(PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND)
+    val historyReadPermissions = setOf(PERMISSION_READ_HEALTH_DATA_HISTORY)
+
 
     private val _state = MutableStateFlow(UserProfileState())
     val state: StateFlow<UserProfileState> = _state.asStateFlow()
@@ -34,23 +58,33 @@ class UserProfileViewModel(
     private var checkNameJob: Job? = null
 
     init {
+        reload()
+    }
+
+    fun reload() {
         viewModelScope.launch {
             val googlePic = repository.getGoogleProfilePic()
             val existingProfile = repository.getOwnProfile()
 
-            _state.update { it.copy(
-                profilePic = googlePic,
-                // If profile exists, load existing data
-                userName = existingProfile?.userName ?: it.userName,
-                age = existingProfile?.age ?: it.age,
-                height = existingProfile?.height ?: it.height,
-                userWeight = existingProfile?.userWeight ?: it.userWeight,
-                gender = existingProfile?.gender ?: it.gender,
-                city = existingProfile?.city ?: it.city,
-                country = existingProfile?.country ?: it.country
-            )}
+            _state.update {
+                UserProfileState(
+                    profilePic = googlePic,
+                    userName = existingProfile?.userName ?: "",
+                    age = existingProfile?.age,
+                    height = existingProfile?.height,
+                    userWeight = existingProfile?.userWeight,
+                    gender = existingProfile?.gender,
+                    city = existingProfile?.city,
+                    country = existingProfile?.country,
+                    heightUnit = it.heightUnit,
+                    weightUnit = it.weightUnit,
+                    weightInputText = existingProfile?.userWeight?.let { w ->
+                        if (it.weightUnit == WeightUnit.LBS) "%.1f".format(w * 2.20462f)
+                        else "%.1f".format(w)
+                    } ?: ""
+                )
+            }
 
-            // Format the initial height text based on the default or loaded unit
             val initialHeight = _state.value.height
             if (initialHeight != null) {
                 val formattedHeight = if (_state.value.heightUnit == HeightUnit.FEET) {
@@ -292,9 +326,9 @@ class UserProfileViewModel(
                 val profile = UserProfileEntity(
                     userId = "",
                     userName = s.userName,
-                    age = s.age ?: 0,
-                    height = s.height ?: 0f,
-                    userWeight = s.userWeight ?: 0f,
+                    age = s.age,
+                    height = s.height,
+                    userWeight = s.userWeight,
                     gender = s.gender,
                     city = s.city,
                     country = s.country,
@@ -304,11 +338,19 @@ class UserProfileViewModel(
                     accountLastUpdated = now,
                 )
                 repository.upsertProfile(profile)
+
+//                // Sync to Health Connect if possible
+//                if (healthConnectManager.checkAvailability() && s.userWeight != null) {
+//                    if (healthConnectManager.hasAllPermissions(healthConnectManager.permissions)) {
+//                        healthConnectManager.writeWeightInput(s.userWeight.toDouble())
+//                    }
+//                }
+
                 _state.update { it.copy(isLoading = false) }
                 _uiEvent.emit(UserProfileUiEvent.NavToHome)
             } catch (e: Exception) {
                 _state.update { it.copy(isLoading = false) }
-                sendSnackbar("Failed to save profile. Please try again.")
+                 sendSnackbar("Failed to save profile. Please try again.")
             }
         }
     }

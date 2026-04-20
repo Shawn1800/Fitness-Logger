@@ -7,6 +7,7 @@ interface UserProfileRepository {
     suspend fun getOwnProfile(): UserProfileEntity?
 //    suspend fun getProfileById(userId:String): UserProfileEntity? // for leaderboards
     suspend fun upsertProfile(profile: UserProfileEntity)
+    suspend fun deleteOwnProfile()
     suspend fun isUserNameTaken(userName: String): Boolean
 
      fun getGoogleProfilePic(): String?

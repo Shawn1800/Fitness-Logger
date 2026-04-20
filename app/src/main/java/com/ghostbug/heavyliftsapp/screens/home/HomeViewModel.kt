@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.ghostbug.heavyliftsapp.data.UseCase.OneRepMaxUseCase
 import com.ghostbug.heavyliftsapp.data.domain.ExerciseEntity
 import com.ghostbug.heavyliftsapp.data.domain.WorkoutEntryEntity
+import com.ghostbug.heavyliftsapp.data.repository.DailyActivityRepository
 import com.ghostbug.heavyliftsapp.data.repository.OneRepMaxRepository
 import com.ghostbug.heavyliftsapp.data.repository.WorkoutRepository
+import com.ghostbug.heavyliftsapp.screens.home.HomeUiEvent.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
@@ -25,8 +27,10 @@ data class GroupedWorkout(
 class HomeViewModel(
     private val workoutRepository: WorkoutRepository,
     private val oneRepMaxRepository: OneRepMaxRepository,
-    private val oneRepMaxUseCase: OneRepMaxUseCase
+    private val dailyActivityRepository: DailyActivityRepository,
 ) : ViewModel() {
+
+
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
@@ -38,6 +42,7 @@ class HomeViewModel(
     init {
         val today = LocalDate.now()
         onEvent(HomeEvent.OnDateSelected(today))
+        loadTodayActivity()
         
         viewModelScope.launch {
             oneRepMaxRepository.updates.collect {
@@ -66,17 +71,18 @@ class HomeViewModel(
             is HomeEvent.OnAddWorkoutClick -> {
                 viewModelScope.launch {
                     _uiEvent.emit(
-                        HomeUiEvent.NavigateToExerciseSelection(
+                        NavigateToExerciseSelection(
                             dateMillis = _state.value.selectedDateMillis
                                 ?: System.currentTimeMillis()
                         )
                     )
                 }
             }
+
             is HomeEvent.EditWorkout -> {
                 viewModelScope.launch {
                     _uiEvent.emit(
-                        HomeUiEvent.NavigateToLogWorkout(
+                        NavigateToLogWorkout(
                             exerciseId = event.exerciseId,
                             dateMillis = _state.value.selectedDateMillis
                                 ?: System.currentTimeMillis()
@@ -87,12 +93,13 @@ class HomeViewModel(
             is HomeEvent.RefreshWorkouts -> {
                 refresh()
             }
-
             is HomeEvent.message -> {
                 viewModelScope.launch {
-                    _uiEvent.emit(HomeUiEvent.ShowSnackbar(event.message))
+                    _uiEvent.emit(ShowSnackbar(event.message))
                 }
             }
+            is HomeEvent.getSteps->loadTodayActivity()
+            is HomeEvent.onDateSelected -> TODO()
         }
     }
 
@@ -141,6 +148,30 @@ class HomeViewModel(
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 _state.update { it.copy(isLoading = false, errorMessage = "No internet connection or server error") }
+            }
+        }
+    }
+
+    private fun loadTodayActivity() {
+        viewModelScope.launch {
+            try {
+                val activity = dailyActivityRepository.getTodayActivity()
+                val goal = dailyActivityRepository.getCurrentGoal()
+                val stepGoal = goal?.stepGoal ?: 10000
+//                val stepByDate= dailyActivityRepository.getStepsByDate()
+
+                _state.update {
+                    it.copy(
+                        todaySteps = activity.steps,
+                        stepGoal = stepGoal,
+                        stepProgress = (activity.steps.toFloat() / stepGoal).coerceIn(0f, 1f),
+                        stepSource = activity.stepSource,
+                        todayCalories = activity.caloriesBurned,
+                        todayDistanceKm = activity.distanceKm
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

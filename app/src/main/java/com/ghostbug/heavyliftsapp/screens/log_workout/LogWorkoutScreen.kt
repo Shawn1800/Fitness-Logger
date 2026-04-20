@@ -36,9 +36,12 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +54,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 // ─── Nothing OS Design System ─────────────────────────────────────────────────
@@ -95,28 +99,27 @@ fun LogWorkoutScreen(
     logWorkoutViewModel: LogWorkoutViewModel = viewModel(),
     onBack: () -> Unit,
 ) {
-    LaunchedEffect(exerciseId) {
+    LaunchedEffect(exerciseId, dateMillis) {
         logWorkoutViewModel.onEvent(LogWorkoutEvent.SetExerciseById(exerciseId, dateMillis = dateMillis))
     }
 
-    val state by logWorkoutViewModel.state.collectAsState()
+    val state by logWorkoutViewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
+    // Use scope.launch so showSnackbar never blocks NavBackToHome collection
     LaunchedEffect(Unit) {
         logWorkoutViewModel.uiEvent.collect { event ->
             when (event) {
                 is LogWorkoutUiEvent.NavBackToHome -> onBack()
-                is LogWorkoutUiEvent.SendSnackbar  -> snackbarHostState.showSnackbar(event.message)
+                is LogWorkoutUiEvent.SendSnackbar  -> scope.launch { snackbarHostState.showSnackbar(event.message) }
             }
         }
     }
 
     Scaffold(
         containerColor = NothingColors.Void,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton = {
-            NothingSaveFab(onClick = { logWorkoutViewModel.onEvent(LogWorkoutEvent.SaveWorkout) })
-        }
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         NothingLogWorkoutContent(
             state = state,
@@ -136,72 +139,97 @@ fun NothingLogWorkoutContent(
     onEvent: (LogWorkoutEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(NothingColors.Void)
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 100.dp)
-    ) {
-        // ── Top bar ───────────────────────────────────────────────
-        NothingLogTopBar(onBack = onBack)
+    // State lives here — no recomposition leak up to LogWorkoutScreen on every keystroke
+    var currentWeight by remember { mutableStateOf("") }
+    var currentReps by remember { mutableStateOf("") }
 
-        // ── Exercise heading ──────────────────────────────────────
-        NothingExerciseHeading(exerciseName = state.exercise?.exerciseName ?: "")
+    LaunchedEffect(state.exercise?.id) {
+        currentWeight = ""
+        currentReps = ""
+    }
 
-        HorizontalDivider(color = NothingColors.Hairline, thickness = 0.5.dp)
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(NothingColors.Void)
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 100.dp)
+        ) {
+            // ── Top bar ───────────────────────────────────────────────
+            NothingLogTopBar(onBack = onBack)
 
-        // ── "Add Set N" label ─────────────────────────────────────
-        NothingSetSectionLabel(
-            label = "ADD SET",
-            number = state.sets.size + 1
-        )
-
-        // ── Current unsaved set ───────────────────────────────────
-        NothingSetRow(
-            setNumber = state.sets.size + 1,
-            weight = state.currentWeight,
-            reps = state.currentReps,
-            onWeightChange = { onEvent(LogWorkoutEvent.UpdateWeight(0, it)) },
-            onRepsChange   = { onEvent(LogWorkoutEvent.UpdateReps(0, it)) },
-            onDeleteSet    = { onEvent(LogWorkoutEvent.DeleteSet(0)) }
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // ── Add Set button ────────────────────────────────────────
-        NothingAddSetButton(
-            onClick = { onEvent(LogWorkoutEvent.OnAddingSets(state.exercise?.id ?: 0)) }
-        )
-
-        // ── Logged sets ───────────────────────────────────────────
-        if (state.sets.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(24.dp))
+            // ── Exercise heading ──────────────────────────────────────
+            NothingExerciseHeading(exerciseName = state.exercise?.exerciseName ?: "")
 
             HorizontalDivider(color = NothingColors.Hairline, thickness = 0.5.dp)
 
+            // ── "Add Set N" label ─────────────────────────────────────
             NothingSetSectionLabel(
-                label = "LOGGED SETS",
-                number = null,
-                count = state.sets.size
+                label = "ADD SET",
+                number = state.sets.size + 1
             )
 
-            state.sets.forEach { setItem ->
-                NothingSetRow(
-                    setNumber  = setItem.sets,
-                    weight     = state.editingWeights[setItem.id] ?: setItem.weight.toString(),
-                    reps       = state.editingReps[setItem.id] ?: setItem.reps.toString(),
-                    onWeightChange = { onEvent(LogWorkoutEvent.UpdateWeight(setItem.id, it)) },
-                    onRepsChange   = { onEvent(LogWorkoutEvent.UpdateReps(setItem.id, it)) },
-                    onDeleteSet    = { onEvent(LogWorkoutEvent.DeleteSet(setItem.id)) }
+            // ── Current unsaved set — bound to local state, no VM per keystroke ──
+            NothingSetRow(
+                setNumber = state.sets.size + 1,
+                weight = currentWeight,
+                reps = currentReps,
+                onWeightChange = { currentWeight = it },
+                onRepsChange = { currentReps = it },
+                onDeleteSet = { currentWeight = ""; currentReps = "" }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // ── Add Set button ────────────────────────────────────────
+            NothingAddSetButton(
+                onClick = {
+                    onEvent(
+                        LogWorkoutEvent.OnAddingSets(
+                            exerciseId = state.exercise?.id ?: 0,
+                            weight = currentWeight,
+                            reps = currentReps
+                        )
+                    )
+                    currentWeight = ""
+                    currentReps = ""
+                }
+            )
+
+            // ── Logged sets ───────────────────────────────────────────
+            if (state.sets.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(24.dp))
+
+                HorizontalDivider(color = NothingColors.Hairline, thickness = 0.5.dp)
+
+                NothingSetSectionLabel(
+                    label = "LOGGED SETS",
+                    number = null,
+                    count = state.sets.size
                 )
-                HorizontalDivider(
-                    color = NothingColors.StrokeWeak,
-                    thickness = 0.5.dp,
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
+
+                state.sets.forEach { setItem ->
+                    NothingLoggedSetRow(
+                        setItem = setItem,
+                        onDeleteSet = { onEvent(LogWorkoutEvent.DeleteSet(setItem.id)) }
+                    )
+                    HorizontalDivider(
+                        color = NothingColors.StrokeWeak,
+                        thickness = 0.5.dp,
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    )
+                }
             }
         }
+
+        // FAB lives here so it reads currentWeight/currentReps at click time only
+        NothingSaveFab(
+            onClick = { onEvent(LogWorkoutEvent.SaveWorkout(currentWeight, currentReps)) },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 16.dp, bottom = 16.dp)
+        )
     }
 }
 
@@ -382,6 +410,26 @@ fun NothingSetRow(
     }
 }
 
+// ─── Logged Set Row (local state — no VM per keystroke) ───────────────────────
+
+@Composable
+private fun NothingLoggedSetRow(
+    setItem: com.ghostbug.heavyliftsapp.data.domain.WorkoutEntryEntity,
+    onDeleteSet: () -> Unit
+) {
+    var localWeight by remember(setItem.id) { mutableStateOf(setItem.weight.toString()) }
+    var localReps by remember(setItem.id) { mutableStateOf(setItem.reps.toString()) }
+
+    NothingSetRow(
+        setNumber = setItem.sets,
+        weight = localWeight,
+        reps = localReps,
+        onWeightChange = { localWeight = it },
+        onRepsChange = { localReps = it },
+        onDeleteSet = onDeleteSet
+    )
+}
+
 // ─── Input Field ──────────────────────────────────────────────────────────────
 
 @Composable
@@ -473,9 +521,10 @@ private fun NothingAddSetButton(onClick: () -> Unit) {
 // ─── Save FAB ─────────────────────────────────────────────────────────────────
 
 @Composable
-fun NothingSaveFab(onClick: () -> Unit) {
+fun NothingSaveFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
     ExtendedFloatingActionButton(
         onClick = onClick,
+        modifier = modifier,
         containerColor = NothingColors.NothingWhite,
         contentColor = NothingColors.Void,
         shape = RoundedCornerShape(4.dp),

@@ -6,6 +6,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.launch
+import androidx.lifecycle.lifecycleScope
 
 import com.ghostbug.heavyliftsapp.ui.theme.Demo103Theme
 
@@ -14,7 +16,9 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import com.ghostbug.heavyLifts.BuildConfig
+
 import com.ghostbug.heavyliftsapp.navigation.MainNavigation
+import kotlinx.coroutines.launch
 
 
 val supabase = createSupabaseClient(
@@ -39,7 +43,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             Demo103Theme {
                 MainNavigation()
-
             }
         }
     }
@@ -56,6 +59,7 @@ class MainActivity : ComponentActivity() {
             onResetPasswordLinkReceived?.invoke()
         }
     }
+
 
 }
 

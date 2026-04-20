@@ -11,5 +11,5 @@ data class  ActivityGoals (
     val stepGoal: Int=10000,
     val calorieGoal: Float=500f,
     val effectiveFrom: LocalDate,
-    val createdAt: Instant
+    val createdAt: Instant?=null
 )

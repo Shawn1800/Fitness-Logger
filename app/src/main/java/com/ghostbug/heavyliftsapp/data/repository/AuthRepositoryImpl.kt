@@ -52,8 +52,16 @@ class AuthRepositoryImpl(
         auth.signOut()
     }
 
+    override suspend fun deleteAccount() {
+        auth.signOut()
+    }
+
     override fun getCurrentUserId(): String? {
         return auth.currentUserOrNull()?.id
+    }
+
+    override fun getCurrentUserEmail(): String? {
+        return auth.currentUserOrNull()?.email
     }
 
     override suspend fun sendPasswordResetEmail(email: String): Boolean {

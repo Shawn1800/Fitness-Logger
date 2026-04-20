@@ -1,36 +1,38 @@
 package com.ghostbug.heavyliftsapp.screens.user_onboarding.new_user_profile
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun UserProfileScreen1(
@@ -38,7 +40,7 @@ fun UserProfileScreen1(
     onNext: () -> Unit,
     onBack: () -> Unit
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
@@ -50,97 +52,141 @@ fun UserProfileScreen1(
             }
         }
     }
-    Scaffold(snackbarHost={ SnackbarHost(snackbarHostState) })
-    {paddingValues->
-    Column(
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .background(OnboardingColors.Void)
+            .dotMatrix()
     ) {
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier.align(Alignment.Start)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back"
-            )
-        }
-
-        Text(
-            text = "Let's get started",
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold
-        )
-
-        Text(
-            text = "Choose your unique username",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        OutlinedTextField(
-            value = state.userName,
-            onValueChange = {
-                viewModel.onEvent(UserProfileEvent.OnUserNameChanged(it))
-            },
-            label = { Text("Username") },
-            placeholder = { Text("e.g., KingLuffy") },
-            isError = state.userNameError != null,
-            supportingText = {
-                // always reserve space so layout doesn't jump
-                Text(
-                    text = state.userNameError ?: "3–20 characters, must be unique",
-                    color = if (state.userNameError != null)
-                        MaterialTheme.colorScheme.error
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            trailingIcon = {
-                when {
-                    state.isLoading -> CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp
-                    )
-                    state.userNameError != null -> Icon(
-                        Icons.Default.Close,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                    state.userName.length in 3..20 && !state.isLoading-> Icon(
-                        Icons.Default.Check,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    else -> {}
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick ={
-                viewModel.onEvent(UserProfileEvent.NavtoScreen2)
-            },
-            enabled = !state.isLoading,
+        SnackbarHost(
+            hostState = snackbarHostState,
             modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp)
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp)
+                .padding(top = 56.dp, bottom = 32.dp)
         ) {
-            if (state.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = OnboardingColors.DimWhite
+                    )
+                }
+                Spacer(Modifier.weight(1f))
+                OnboardingStepProgress(current = 0)
+            }
+
+            Spacer(Modifier.height(44.dp))
+
+            Text(
+                text = "CHOOSE YOUR\nHANDLE.",
+                color = OnboardingColors.NothingWhite,
+                fontSize = 34.sp,
+                fontWeight = FontWeight.Black,
+                lineHeight = 38.sp,
+                letterSpacing = (-0.5).sp,
+                fontFamily = FontFamily.Monospace
+            )
+
+            Spacer(Modifier.height(10.dp))
+
+            Text(
+                text = "this is how others will find you.",
+                color = OnboardingColors.DimWhite,
+                fontSize = 11.sp,
+                fontFamily = FontFamily.Monospace,
+                letterSpacing = 0.5.sp
+            )
+
+            Spacer(Modifier.height(52.dp))
+
+            OnboardingSectionLabel("USERNAME")
+
+            OnboardingTextField(
+                value = state.userName,
+                onValueChange = { viewModel.onEvent(UserProfileEvent.OnUserNameChanged(it)) },
+                placeholder = "e.g., kingruffy",
+                error = state.userNameError,
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    when {
+                        state.isLoading -> CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                            color = OnboardingColors.DimWhite
+                        )
+                        state.userNameError != null -> Icon(
+                            Icons.Default.Close,
+                            contentDescription = null,
+                            tint = OnboardingColors.GlyphRed,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        state.userName.length in 3..20 && !state.isLoading -> Icon(
+                            Icons.Default.Check,
+                            contentDescription = null,
+                            tint = OnboardingColors.NothingWhite,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        else -> {}
+                    }
+                }
+            )
+
+            if (state.userNameError == null) {
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = "3–20 characters  ·  must be unique",
+                    color = OnboardingColors.FaintWhite,
+                    fontSize = 10.sp,
+                    fontFamily = FontFamily.Monospace,
+                    letterSpacing = 0.3.sp
                 )
-            } else {
-                Text("Next")
+            }
+
+            Spacer(Modifier.weight(1f))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+                    .background(
+                        color = if (state.isLoading) OnboardingColors.Surface2
+                        else OnboardingColors.NothingWhite,
+                        shape = RoundedCornerShape(2.dp)
+                    )
+                    .clickable(enabled = !state.isLoading) {
+                        viewModel.onEvent(UserProfileEvent.NavtoScreen2)
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                if (state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = OnboardingColors.DimWhite
+                    )
+                } else {
+                    Text(
+                        text = "CONTINUE",
+                        color = OnboardingColors.Void,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 3.sp,
+                        fontFamily = FontFamily.Monospace
+                    )
+                }
             }
         }
     }
-}}
+}

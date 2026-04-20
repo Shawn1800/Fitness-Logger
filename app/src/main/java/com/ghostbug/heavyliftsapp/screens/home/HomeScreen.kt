@@ -26,7 +26,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,7 +38,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -49,7 +47,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.window.Dialog
-import com.ghostbug.heavyliftsapp.data.domain.ExerciseEntity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ghostbug.heavyliftsapp.screens.signUp.SignUpEvent
 import com.ghostbug.heavyliftsapp.screens.signUp.SignUpUiEvent
 import com.ghostbug.heavyliftsapp.screens.signUp.SignUpViewModel
@@ -85,43 +86,7 @@ private object NothingColors {
     // Semantic
     val Positive     = Color(0xFFE8E8E8) // near-white for gains
     val Negative     = Color(0xFF666666) // dim for losses
-    val PositiveBg   = Color(0xFF1C1C1C)
-    val NegativeBg   = Color(0xFF141414)
-    val PositiveGreen = Color(0xFF32E05A)
-    val PositiveBlue = Color(0xFF00BCD4)
-}
 
-// Dot-matrix pattern drawn in Canvas — Nothing's signature glyph texture
-private fun Modifier.dotMatrixBackground(
-    dotColor: Color = NothingColors.FaintWhite.copy(alpha = 0.18f),
-    spacing: Float = 14f,
-    radius: Float = 1.2f
-): Modifier = this.drawBehind {
-    val cols = (size.width / spacing).toInt() + 1
-    val rows = (size.height / spacing).toInt() + 1
-    for (col in 0..cols) {
-        for (row in 0..rows) {
-            drawCircle(
-                color = dotColor,
-                radius = radius,
-                center = Offset(col * spacing, row * spacing)
-            )
-        }
-    }
-}
-
-// Vertical glyph accent line — mimics Nothing's interface strips
-private fun Modifier.glyphAccentLine(
-    color: Color = NothingColors.GlyphRed,
-    width: Float = 2f
-): Modifier = this.drawBehind {
-    drawLine(
-        color = color,
-        start = Offset(0f, size.height * 0.15f),
-        end = Offset(0f, size.height * 0.85f),
-        strokeWidth = width,
-        cap = StrokeCap.Round
-    )
 }
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
@@ -132,17 +97,15 @@ fun HomeScreen(
     signUpViewModel: SignUpViewModel = viewModel(),
     onNavigateToExerciseSelection: () -> Unit,
     onNavigateToLogWorkout: (Long) -> Unit,
-    onNavigateToLogIn: () -> Unit
+    onNavigateToLogIn: () -> Unit,
+    onNavigateToStepTracker: () ->Unit
 ) {
-    val state by homeViewModel.state.collectAsState()
+    val state by homeViewModel.state.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         homeViewModel.onEvent(HomeEvent.RefreshWorkouts)
-    }
-
-    LaunchedEffect(Unit) {
         launch {
             signUpViewModel.uiEvent.collect { event ->
                 if (event is SignUpUiEvent.NavigateToSignIn) onNavigateToLogIn()
@@ -154,10 +117,21 @@ fun HomeScreen(
                     is HomeUiEvent.NavigateToExerciseSelection -> onNavigateToExerciseSelection()
                     is HomeUiEvent.NavigateToLogWorkout -> onNavigateToLogWorkout(event.exerciseId)
                     is HomeUiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
-
+                    is HomeUiEvent.NavigateToStepTracker -> onNavigateToStepTracker()
                 }
             }
         }
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                homeViewModel.onEvent(HomeEvent.getSteps)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     if (showLogoutDialog) {
@@ -187,7 +161,7 @@ fun HomeScreen(
             paddingValues = paddingValues,
             onDateSelected = { date -> homeViewModel.onEvent(HomeEvent.OnDateSelected(date)) },
             onEvent = { homeViewModel.onEvent(it) },
-            onLogoutClick = { showLogoutDialog = true }
+            onStepClick = {onNavigateToStepTracker()}
         )
     }
 }
@@ -200,7 +174,7 @@ private fun HomeContent(
     paddingValues: PaddingValues,
     onDateSelected: (LocalDate) -> Unit,
     onEvent: (HomeEvent) -> Unit,
-    onLogoutClick: () -> Unit
+    onStepClick: () -> Unit
 ) {
     val totalWeeks = 500
     val pagerState = rememberPagerState(
@@ -230,8 +204,7 @@ private fun HomeContent(
         // ── Header ─────────────────────────────────────────────────────────
         NothingHeader(
             monthName = currentMonthName,
-            year = currentYear,
-            onLogoutClick = onLogoutClick
+            year = currentYear
         )
 
         // ── Hairline divider ────────────────────────────────────────────────
@@ -249,6 +222,11 @@ private fun HomeContent(
             selectedDate = state.selectedDate,
             onDateSelected = onDateSelected
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // ── Activity banner ─────────────────────────────────────────────────
+        ActivityBanner(state = state, onClick = onStepClick)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -295,65 +273,110 @@ private fun HomeContent(
 private fun NothingHeader(
     monthName: String,
     year: String,
-    onLogoutClick: () -> Unit
 ) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 16.dp),
+    ) {
+        Text(
+            text = year,
+            color = NothingColors.DimWhite,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 2.sp,
+            fontFamily = FontFamily.Monospace
+        )
+        Text(
+            text = monthName,
+            color = NothingColors.NothingWhite,
+            fontWeight = FontWeight.Black,
+            fontSize = 34.sp,
+            letterSpacing = (-1).sp,
+            lineHeight = 34.sp
+        )
+    }
+}
+
+// ─── Activity Strip ───────────────────────────────────────────────────────────
+
+@Composable
+private fun ActivityBanner(
+    state: HomeState,
+    onClick: () -> Unit
+) {
+    val goalReached = state.stepProgress >= 1f
+    val accentColor = if (goalReached) NothingColors.GlyphRed else NothingColors.NothingWhite
+    val fill = state.stepProgress.coerceIn(0f, 1f)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 20.dp, end = 8.dp, top = 20.dp, bottom = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Bottom
+            .padding(horizontal = 20.dp)
+            .height(40.dp)
+            .clickable { onClick() },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Column {
-            // Nothing's signature: tight stacked typography
+        // glyph dot
+        Box(
+            Modifier
+                .size(4.dp)
+                .background(accentColor, CircleShape)
+        )
+
+        // step count
+        Text(
+            text = "%,d".format(state.todaySteps),
+            color = accentColor,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Black,
+            fontFamily = FontFamily.Monospace,
+            letterSpacing = (-0.3).sp
+        )
+
+        // goal
+        Text(
+            text = "/ %,d".format(state.stepGoal),
+            color = NothingColors.FaintWhite,
+            fontSize = 10.sp,
+            fontFamily = FontFamily.Monospace
+        )
+
+        // progress bar — fills remaining space
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(2.dp)
+                .background(NothingColors.FaintWhite, RoundedCornerShape(1.dp))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(fill)
+                    .height(2.dp)
+                    .background(accentColor, RoundedCornerShape(1.dp))
+            )
+        }
+
+        // calories (only if non-zero)
+        if (state.todayCalories > 0f) {
             Text(
-                text = year,
-                color = NothingColors.DimWhite,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Normal,
-                letterSpacing = 2.sp,
+                text = "${state.todayCalories.toInt()} kcal",
+                color = NothingColors.FaintWhite,
+                fontSize = 9.sp,
                 fontFamily = FontFamily.Monospace
             )
-            Text(
-                text = monthName,
-                color = NothingColors.NothingWhite,
-                fontWeight = FontWeight.Black,
-                fontSize = 34.sp,
-                letterSpacing = (-1).sp,
-                lineHeight = 34.sp
-            )
         }
 
-        // Glyph-dot accent + logout
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            // Decorative glyph indicator dots
-            Column(
-                verticalArrangement = Arrangement.spacedBy(3.dp),
-                modifier = Modifier.padding(end = 4.dp)
-            ) {
-                repeat(3) { i ->
-                    Box(
-                        modifier = Modifier
-                            .size(if (i == 0) 6.dp else 4.dp)
-                            .background(
-                                if (i == 0) NothingColors.GlyphRed else NothingColors.FaintWhite,
-                                CircleShape
-                            )
-                    )
-                }
-            }
-
-            IconButton(onClick = onLogoutClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = "Logout",
-                    tint = NothingColors.DimWhite,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
+        // chevron
+        Text(
+            text = "›",
+            color = NothingColors.FaintWhite,
+            fontSize = 14.sp
+        )
     }
 }
+
 
 // ─── Logout Dialog ────────────────────────────────────────────────────────────
 
@@ -558,7 +581,8 @@ private fun NothingDateItem(
                 .background(bgColor, RoundedCornerShape(4.dp))
                 .then(
                     if (isToday && !isSelected)
-                        Modifier.background(Color.Transparent)
+                        Modifier
+                            .background(Color.Transparent)
                             .clip(RoundedCornerShape(4.dp))
                     else Modifier
                 ),
@@ -1036,7 +1060,6 @@ private fun NothingEmptyState() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .dotMatrixBackground()
             .padding(bottom = 80.dp),
         contentAlignment = Alignment.Center
     ) {
