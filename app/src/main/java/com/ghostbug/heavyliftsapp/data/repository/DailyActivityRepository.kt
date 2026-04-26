@@ -16,11 +16,12 @@ interface  DailyActivityRepository {
  // sync today's data to Supabase — called by WorkManager
  suspend fun syncToSupabase(date: LocalDate)
 
+
  // goals
  suspend fun getCurrentGoal(): ActivityGoals?
  suspend fun saveGoal(stepGoal: Int, calorieGoal: Float)
 
- suspend fun getStepsByDate(steps:Long,createdAt: Instant): DailyActivity
+ suspend fun getActivityByDate(date: LocalDate): DailyActivity
 
 
 }

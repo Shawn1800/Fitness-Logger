@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -235,7 +236,7 @@ fun StepTrackerScreen(
                     )
 
                     if (state.history.isNotEmpty()) {
-                        WeeklyBarChart(history = state.history)
+                        WeeklyBarChart(history = state.history, stepGoal = state.stepGoal)
                     }
 
                     Spacer(Modifier.height(16.dp))
@@ -495,119 +496,317 @@ private fun StatCard(
 
 @Composable
 private fun WeeklyBarChart(
-    history: List<com.ghostbug.heavyliftsapp.data.domain.DailyActivity>
+    history: List<com.ghostbug.heavyliftsapp.data.domain.DailyActivity>,
+    stepGoal: Int = 10_000
 ) {
-    val primaryColor = NothingColors.GlyphRed
-    val trackColor   = NothingColors.FaintWhite
-    val maxSteps     = history.maxOfOrNull { it.steps }?.toFloat() ?: 1f
+    val days      = history.take(7)
+    val weekDays  = days.reversed()
+    val rawMax    = days.maxOfOrNull { it.steps }?.toFloat() ?: 0f
+    val maxSteps  = maxOf(rawMax * 1.05f, stepGoal.toFloat())
+    val goalFrac  = (stepGoal.toFloat() / maxSteps).coerceIn(0f, 1f)
+    val todayDate = days.firstOrNull()?.date
+
+    val totalSteps   = days.sumOf { it.steps }
+    val avgSteps     = if (days.isNotEmpty()) totalSteps / days.size else 0
+    val bestSteps    = days.maxOfOrNull { it.steps } ?: 0
+    val daysHitGoal  = days.count { it.steps >= stepGoal }
+    val hitGoal      = daysHitGoal > 0
+
+    val barColor      = NothingColors.GlyphRed
+    val dimBarColor   = NothingColors.GlyphRed.copy(alpha = 0.35f)
+    val gridColor     = NothingColors.Hairline
+    val goalDashColor = NothingColors.GlyphRed.copy(alpha = 0.55f)
 
     NothingCard {
         Column(modifier = Modifier.padding(20.dp)) {
+
+            // ── Header ────────────────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text       = "last 7 days",
-                    fontSize   = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color      = NothingColors.NothingWhite,
-                    letterSpacing = (-0.3).sp
-                )
-                Text(
-                    text     = "%,d total".format(history.take(7).sumOf { it.steps }),
-                    fontSize = 11.sp,
-                    color    = NothingColors.Negative
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text          = "weekly activity",
+                        fontSize      = 14.sp,
+                        fontWeight    = FontWeight.SemiBold,
+                        color         = NothingColors.NothingWhite,
+                        letterSpacing = (-0.3).sp
+                    )
+                    Text(
+                        text          = "last 7 days",
+                        fontSize      = 10.sp,
+                        color         = NothingColors.DimWhite,
+                        letterSpacing = 0.3.sp
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .background(
+                            if (hitGoal) NothingColors.GlyphRedDim else NothingColors.Surface2,
+                            RoundedCornerShape(99.dp)
+                        )
+                        .border(
+                            1.dp,
+                            if (hitGoal) NothingColors.GlyphRed.copy(alpha = 0.3f) else NothingColors.Hairline,
+                            RoundedCornerShape(99.dp)
+                        )
+                        .padding(horizontal = 10.dp, vertical = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(5.dp)
+                            .background(
+                                if (hitGoal) NothingColors.GlyphRed else NothingColors.DimWhite,
+                                CircleShape
+                            )
+                    )
+                    Text(
+                        text          = "$daysHitGoal/7 goals",
+                        fontSize      = 10.sp,
+                        fontWeight    = FontWeight.SemiBold,
+                        color         = if (hitGoal) NothingColors.GlyphRed else NothingColors.DimWhite,
+                        letterSpacing = 0.05.sp,
+                        fontFamily    = FontFamily.Monospace
+                    )
+                }
             }
 
             Spacer(Modifier.height(18.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(90.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                history.take(7).reversed().forEach { activity ->
-                    val barProgress = if (maxSteps > 0) activity.steps / maxSteps else 0f
+            // ── Chart ─────────────────────────────────────────────────────
+            Row(modifier = Modifier.fillMaxWidth()) {
 
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Bottom,
-                        modifier = Modifier.weight(1f)
+                // Y-axis labels aligned to bar area (offset by step-label row: 14dp + 2dp spacer)
+                Column(
+                    modifier = Modifier
+                        .width(30.dp)
+                        .padding(top = 16.dp)
+                        .height(110.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    listOf(maxSteps, maxSteps * 0.5f, 0f).forEach { v ->
+                        Text(
+                            text      = barChartCompactSteps(v.toInt()),
+                            fontSize  = 8.sp,
+                            color     = NothingColors.DimWhite,
+                            fontFamily = FontFamily.Monospace,
+                            textAlign = TextAlign.End,
+                            modifier  = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                Spacer(Modifier.width(6.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+
+                    // Step count labels above each bar
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(14.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Canvas(
-                            modifier = Modifier
-                                .width(18.dp)
-                                .weight(1f)
-                        ) {
-                            val barHeight    = size.height * barProgress
-                            val cornerRadius = CornerRadius(5.dp.toPx())
+                        weekDays.forEach { activity ->
+                            val isToday = activity.date == todayDate
+                            Box(
+                                modifier = Modifier.weight(1f),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (activity.steps > 0) {
+                                    Text(
+                                        text       = barChartCompactSteps(activity.steps),
+                                        fontSize   = 7.sp,
+                                        color      = if (isToday) NothingColors.NothingWhite else NothingColors.DimWhite,
+                                        fontFamily = FontFamily.Monospace,
+                                        fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
+                                        textAlign  = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+                    }
 
-                            drawRoundRect(
-                                color        = trackColor,
-                                size         = Size(size.width, size.height),
-                                cornerRadius = cornerRadius
-                            )
-                            if (barProgress > 0f) {
-                                drawRoundRect(
-                                    color        = primaryColor,
-                                    topLeft      = Offset(0f, size.height - barHeight),
-                                    size         = Size(size.width, barHeight),
-                                    cornerRadius = cornerRadius
+                    Spacer(Modifier.height(2.dp))
+
+                    // Bar area with overlaid gridlines + goal line
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(110.dp)
+                    ) {
+                        Canvas(modifier = Modifier.fillMaxSize()) {
+                            // Subtle horizontal gridlines at 0%, 50%, 100%
+                            listOf(0f, 0.5f, 1f).forEach { fraction ->
+                                val y = size.height * (1f - fraction)
+                                drawLine(
+                                    color       = gridColor,
+                                    start       = Offset(0f, y),
+                                    end         = Offset(size.width, y),
+                                    strokeWidth = 0.5.dp.toPx()
                                 )
+                            }
+                            // Dashed goal line
+                            val goalY = size.height * (1f - goalFrac)
+                            val dash = 6.dp.toPx()
+                            val gap  = 3.dp.toPx()
+                            var x = 0f
+                            while (x < size.width) {
+                                drawLine(
+                                    color       = goalDashColor,
+                                    start       = Offset(x, goalY),
+                                    end         = Offset(minOf(x + dash, size.width), goalY),
+                                    strokeWidth = 1.dp.toPx()
+                                )
+                                x += dash + gap
                             }
                         }
 
-                        Spacer(Modifier.height(5.dp))
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            weekDays.forEach { activity ->
+                                val isToday   = activity.date == todayDate
+                                val frac      = if (maxSteps > 0) (activity.steps / maxSteps).coerceIn(0f, 1f) else 0f
+                                val fillColor = if (isToday) barColor else dimBarColor
 
-                        Text(
-                            text      = activity.date.dayOfWeek.name.take(1),
-                            fontSize  = 9.sp,
-                            fontWeight = FontWeight.Medium,
-                            color     = NothingColors.DimWhite,
-                            textAlign = TextAlign.Center,
-                            letterSpacing = 0.05.sp
-                        )
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight(),
+                                    contentAlignment = Alignment.BottomCenter
+                                ) {
+                                    Canvas(
+                                        modifier = Modifier
+                                            .width(if (isToday) 20.dp else 15.dp)
+                                            .fillMaxHeight()
+                                    ) {
+                                        val corner = CornerRadius(4.dp.toPx())
+                                        drawRoundRect(
+                                            color        = NothingColors.FaintWhite,
+                                            size         = Size(size.width, size.height),
+                                            cornerRadius = corner
+                                        )
+                                        if (frac > 0f) {
+                                            val fillH = size.height * frac
+                                            drawRoundRect(
+                                                color        = fillColor,
+                                                topLeft      = Offset(0f, size.height - fillH),
+                                                size         = Size(size.width, fillH),
+                                                cornerRadius = corner
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(4.dp))
+
+                    // Day labels
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        weekDays.forEach { activity ->
+                            val isToday = activity.date == todayDate
+                            Box(
+                                modifier = Modifier.weight(1f),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = activity.date.dayOfWeek.name
+                                        .take(3)
+                                        .lowercase()
+                                        .replaceFirstChar { it.uppercase() },
+                                    fontSize   = 8.sp,
+                                    fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
+                                    color      = if (isToday) NothingColors.GlyphRed else NothingColors.DimWhite,
+                                    fontFamily = FontFamily.Monospace,
+                                    textAlign  = TextAlign.Center
+                                )
+                            }
+                        }
                     }
                 }
             }
 
+            // Goal line legend
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Canvas(modifier = Modifier.width(14.dp).height(8.dp)) {
+                    val dash = 4.dp.toPx(); val gap = 2.dp.toPx(); var cx = 0f
+                    while (cx < size.width) {
+                        drawLine(
+                            color       = goalDashColor,
+                            start       = Offset(cx, size.height / 2),
+                            end         = Offset(minOf(cx + dash, size.width), size.height / 2),
+                            strokeWidth = 1.dp.toPx()
+                        )
+                        cx += dash + gap
+                    }
+                }
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    text      = "goal · %,d steps".format(stepGoal),
+                    fontSize  = 9.sp,
+                    color     = NothingColors.DimWhite,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
+
             Spacer(Modifier.height(12.dp))
 
-            // divider
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(NothingColors.Hairline)
-            )
+            Box(Modifier.fillMaxWidth().height(1.dp).background(NothingColors.Hairline))
 
             Spacer(Modifier.height(12.dp))
 
+            // Footer: 3 stats
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text     = "Total  %,d".format(history.take(7).sumOf { it.steps }),
-                    fontSize = 11.sp,
-                    color    = NothingColors.Negative
-                )
-                Text(
-                    text = "Avg  %,d/day".format(
-                        if (history.take(7).isNotEmpty())
-                            history.take(7).sumOf { it.steps } / history.take(7).size
-                        else 0
-                    ),
-                    fontSize = 11.sp,
-                    color    = NothingColors.Negative
-                )
+                BarChartFooterStat("TOTAL",    "%,d".format(totalSteps))
+                BarChartFooterStat("AVG / DAY", "%,d".format(avgSteps))
+                BarChartFooterStat("BEST DAY", "%,d".format(bestSteps))
             }
         }
+    }
+}
+
+private fun barChartCompactSteps(steps: Int): String = when {
+    steps <= 0      -> "—"
+    steps >= 1_000  -> "%.1fk".format(steps / 1000f)
+    else            -> steps.toString()
+}
+
+@Composable
+private fun BarChartFooterStat(label: String, value: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text          = label,
+            fontSize      = 8.sp,
+            color         = NothingColors.DimWhite,
+            letterSpacing = 1.sp,
+            fontFamily    = FontFamily.Monospace
+        )
+        Text(
+            text       = value,
+            fontSize   = 13.sp,
+            fontWeight = FontWeight.Bold,
+            color      = NothingColors.OffWhite,
+            fontFamily = FontFamily.Monospace
+        )
     }
 }
 

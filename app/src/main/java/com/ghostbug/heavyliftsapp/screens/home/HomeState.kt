@@ -1,9 +1,12 @@
 package com.ghostbug.heavyliftsapp.screens.home
 
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
-data class HomeState (
-    val selectedDate: LocalDate = LocalDate.now(),
+data class HomeState(
+    val selectedDate: LocalDate =Clock.System.todayIn(TimeZone.currentSystemDefault()),
     val selectedDateMillis: Long? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
@@ -14,4 +17,4 @@ data class HomeState (
     val stepSource: String = "sensor",
     val todayCalories: Float = 0f,
     val todayDistanceKm: Float = 0f
-    )
+)

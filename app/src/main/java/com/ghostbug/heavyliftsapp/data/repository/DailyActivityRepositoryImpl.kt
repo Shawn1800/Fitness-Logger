@@ -100,7 +100,7 @@ class DailyActivityRepositoryImpl(
                     }
                     .decodeList<DailyActivityDto>()
                     .map { it.toDomain() }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 emptyList()
             }
         }
@@ -144,9 +144,7 @@ class DailyActivityRepositoryImpl(
                     .upsert(dto) {
                         onConflict = "user_id,date"
                     }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            } catch (_: Exception) { }
         }
     }
 
@@ -170,7 +168,7 @@ class DailyActivityRepositoryImpl(
                     }
                     .decodeSingleOrNull<ActivityGoalsDto>()
                     ?.toDomain()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 null
             }
         }
@@ -190,44 +188,39 @@ class DailyActivityRepositoryImpl(
                     .upsert(dto) {
                         onConflict = "user_id,effective_from"
                     }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            } catch (_: Exception) { }
         }
     }
 
-    override suspend fun getStepsByDate(steps: Long,createdAt: Instant): DailyActivity {
-       val userId = currentUserId?: return emptyActivity()
-
-        return withContext(Dispatchers.IO){
-            val result =postgrest.from(TABLE_DAILY_ACTIVITY)
-                .select {
-                    filter {
-                        eq ("user_id",userId)
-                        eq("steps",steps)
-                        eq("created_at",createdAt)
+    override suspend fun getActivityByDate(date: LocalDate): DailyActivity {
+        val userId = currentUserId ?: return emptyActivity()
+        return withContext(Dispatchers.IO) {
+            try {
+                postgrest.from(TABLE_DAILY_ACTIVITY)
+                    .select {
+                        filter {
+                            eq("user_id", userId)
+                            eq("date", date.toString())
                         }
                     }
-                .decodeSingleOrNull<DailyActivityDto>()
-                 result?.toDomain()?:emptyActivity()
-                }
+                    .decodeSingleOrNull<DailyActivityDto>()
+                    ?.toDomain() ?: emptyActivity()
+            } catch (e: Exception) {
+                emptyActivity()
+            }
         }
+    }
 
 
 
     // ─── Calorie logic ────────────────────────────────────────────────────────
 
     private suspend fun getCaloriesForDay(date: LocalDate): Pair<Float, String> {
-        // try active calories from HC
         val activeCalories = healthConnectManager.readCaloriesForDay(date)
         if (activeCalories != null && activeCalories > 0) {
-            println("DEBUG CALORIES ── using active: $activeCalories")
             return Pair(activeCalories.toFloat(), "health_connect")
         }
-
-        // fallback — estimate from steps
         val steps = healthConnectManager.readStepsForDay(date) ?: 0L
-        println("DEBUG CALORIES ── estimating from steps: $steps")
         return Pair(estimateCaloriesFromSteps(steps), "estimated")
     }
 
@@ -256,43 +249,8 @@ class DailyActivityRepositoryImpl(
             val met = if (steps > 10000) 4.5f else 3.5f
             val timeHours = distanceKm / 5.0f
             met * weightKg * timeHours
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             steps * 0.04f
-        }
-    }
-
-
-
-    private suspend fun getUserBmr(): Double {
-        return try {
-            val profile = userProfileRepository.getOwnProfile()
-
-            val weightKg = profile?.userWeight?.toDouble()
-                ?.takeIf { it > 0 } ?: 70.0
-            val heightCm = profile?.height?.toDouble()
-                ?.takeIf { it > 0 } ?: 170.0
-            val age = profile?.age
-                ?.takeIf { it > 0 } ?: 25
-
-            println("DEBUG BMR ── weight: $weightKg height: $heightCm age: $age gender: ${profile?.gender}")
-
-            val bmr = when (profile?.gender?.name?.lowercase()) {
-                "male" -> (10 * weightKg) + (6.25 * heightCm) - (5 * age) + 5
-                "female" -> (10 * weightKg) + (6.25 * heightCm) - (5 * age) - 161
-                else -> (10 * weightKg) + (6.25 * heightCm) - (5 * age) - 78
-            }
-
-            // sanity check — BMR should always be between 1000 and 4000
-            if (bmr < 1000 || bmr > 4000) {
-                println("DEBUG BMR ── BMR out of range: $bmr, using default 1800")
-                return 1800.0
-            }
-
-            println("DEBUG BMR ── calculated BMR: $bmr kcal/day")
-            bmr
-        } catch (e: Exception) {
-            println("DEBUG BMR ── exception: ${e.message}, using default 1800")
-            1800.0
         }
     }
 }

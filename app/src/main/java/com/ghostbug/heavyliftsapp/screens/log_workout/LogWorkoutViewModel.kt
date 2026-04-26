@@ -28,6 +28,8 @@ class LogWorkoutViewModel(
 ) : ViewModel() {
 
 
+
+
     private val _state = MutableStateFlow(LogWorkoutState())
     val state: StateFlow<LogWorkoutState> = _state.asStateFlow()
 
@@ -50,6 +52,7 @@ class LogWorkoutViewModel(
     private fun handleSetExerciseById(event: LogWorkoutEvent.SetExerciseById) {
         // allow reload if the exercise or date changed (VM lives for Activity lifetime)
         if (_state.value.exercise?.id == event.exerciseId && _state.value.dateMillis == event.dateMillis) return
+        _state.update { it.copy(exercise = null, sets = emptyList(), dateMillis = event.dateMillis) }
         viewModelScope.launch {
             try {
                 val exercise = exerciseRepository.getExerciseById(event.exerciseId)

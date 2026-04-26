@@ -294,7 +294,7 @@ fun MainNavigation(
                                 navigator.navigate(Route.UserProfileScreen3)
                             },
                             onBack = {
-                                navigator.clearCurrentStack()
+                                navigator.navigate(Route.UserProfileScreen1)
                             }
                         )
 
@@ -305,9 +305,10 @@ fun MainNavigation(
                         UserProfileScreen3(
                             viewModel = userProfileViewModel,
                             onBack = {
-                                navigator.clearCurrentStack()
+                                navigator.navigate(Route.UserProfileScreen2)
                             },
                             onNext = {
+                                navigator.clearAll()
                                 navigator.navigate(Route.HomeScreen)
                             }
 

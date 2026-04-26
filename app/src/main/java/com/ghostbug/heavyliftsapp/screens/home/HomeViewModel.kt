@@ -2,21 +2,24 @@ package com.ghostbug.heavyliftsapp.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ghostbug.heavyliftsapp.data.UseCase.OneRepMaxUseCase
 import com.ghostbug.heavyliftsapp.data.domain.ExerciseEntity
 import com.ghostbug.heavyliftsapp.data.domain.WorkoutEntryEntity
 import com.ghostbug.heavyliftsapp.data.repository.DailyActivityRepository
 import com.ghostbug.heavyliftsapp.data.repository.OneRepMaxRepository
 import com.ghostbug.heavyliftsapp.data.repository.WorkoutRepository
 import com.ghostbug.heavyliftsapp.screens.home.HomeUiEvent.*
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.supervisorScope
-import java.time.LocalDate
-import java.time.ZoneId
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
+
 
 data class GroupedWorkout(
     val exercise: ExerciseEntity,
@@ -30,7 +33,6 @@ class HomeViewModel(
     private val dailyActivityRepository: DailyActivityRepository,
 ) : ViewModel() {
 
-
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
@@ -40,10 +42,10 @@ class HomeViewModel(
     private var workoutJob: Job? = null
 
     init {
-        val today = LocalDate.now()
+        val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
         onEvent(HomeEvent.OnDateSelected(today))
-        loadTodayActivity()
-        
+        loadActivityForDate(today)
+
         viewModelScope.launch {
             oneRepMaxRepository.updates.collect {
                 _state.value.selectedDateMillis?.let { observeWorkoutsForDate(it) }
@@ -55,9 +57,8 @@ class HomeViewModel(
         when (event) {
             is HomeEvent.OnDateSelected -> {
                 val millis = event.date
-                    .atStartOfDay(ZoneId.systemDefault())
-                    .toInstant()
-                    .toEpochMilli()
+                    .atStartOfDayIn(TimeZone.currentSystemDefault())
+                    .toEpochMilliseconds()
 
                 _state.update {
                     it.copy(
@@ -66,14 +67,14 @@ class HomeViewModel(
                     )
                 }
                 observeWorkoutsForDate(millis)
+                loadActivityForDate(event.date)
             }
 
             is HomeEvent.OnAddWorkoutClick -> {
                 viewModelScope.launch {
                     _uiEvent.emit(
                         NavigateToExerciseSelection(
-                            dateMillis = _state.value.selectedDateMillis
-                                ?: System.currentTimeMillis()
+                            dateMillis = _state.value.selectedDateMillis ?: System.currentTimeMillis()
                         )
                     )
                 }
@@ -84,22 +85,22 @@ class HomeViewModel(
                     _uiEvent.emit(
                         NavigateToLogWorkout(
                             exerciseId = event.exerciseId,
-                            dateMillis = _state.value.selectedDateMillis
-                                ?: System.currentTimeMillis()
+                            dateMillis = _state.value.selectedDateMillis ?: System.currentTimeMillis()
                         )
                     )
                 }
             }
-            is HomeEvent.RefreshWorkouts -> {
-                refresh()
+
+            is HomeEvent.RefreshWorkouts -> refresh()
+
+            is HomeEvent.Message -> {
+                viewModelScope.launch { _uiEvent.emit(ShowSnackbar(event.message)) }
             }
-            is HomeEvent.message -> {
-                viewModelScope.launch {
-                    _uiEvent.emit(ShowSnackbar(event.message))
-                }
-            }
-            is HomeEvent.getSteps->loadTodayActivity()
-            is HomeEvent.onDateSelected -> TODO()
+
+            // ON_RESUME refresh — reload activity for the currently selected date
+            is HomeEvent.GetSteps -> loadActivityForDate(_state.value.selectedDate)
+
+            is HomeEvent.OnStepsChanged -> loadActivityForDate(_state.value.selectedDate)
         }
     }
 
@@ -113,13 +114,12 @@ class HomeViewModel(
             _state.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
-                // Use supervisorScope so that if one request fails, it doesn't crash the coroutine
                 supervisorScope {
                     val workoutsDeferred = async { workoutRepository.getWorkoutByDate(dateMillis) }
                     val maxesDeferred = async { oneRepMaxRepository.getOneRepMaxForDate(dateMillis) }
 
-                    val workouts = try { workoutsDeferred.await() } catch (e: Exception) { emptyList() }
-                    val oneRepMaxes = try { maxesDeferred.await() } catch (e: Exception) { emptyList() }
+                    val workouts = try { workoutsDeferred.await() } catch (_: Exception) { emptyList() }
+                    val oneRepMaxes = try { maxesDeferred.await() } catch (_: Exception) { emptyList() }
 
                     val oneRMMap = oneRepMaxes.associateBy { it.exerciseId }
 
@@ -128,15 +128,15 @@ class HomeViewModel(
                         .map { (exerciseId, entries) ->
                             GroupedWorkout(
                                 exercise = entries.first().exercise,
-                                sets = entries.map { workoutWithExercise ->
+                                sets = entries.map { w ->
                                     WorkoutEntryEntity(
-                                        id = workoutWithExercise.id,
-                                        exerciseId = workoutWithExercise.exercise.id,
-                                        weight = workoutWithExercise.weight.toFloat(),
-                                        reps = workoutWithExercise.reps,
-                                        sets = workoutWithExercise.sets,
-                                        date = workoutWithExercise.date,
-                                        userId = workoutWithExercise.userId
+                                        id = w.id,
+                                        exerciseId = w.exercise.id,
+                                        weight = w.weight.toFloat(),
+                                        reps = w.reps,
+                                        sets = w.sets,
+                                        date = w.date,
+                                        userId = w.userId
                                     )
                                 },
                                 changePercent = oneRMMap[exerciseId]?.changePercent?.toFloat()
@@ -152,13 +152,18 @@ class HomeViewModel(
         }
     }
 
-    private fun loadTodayActivity() {
+    // Today → live sensor data from Health Connect
+    // Past date → historical data from Supabase
+    private fun loadActivityForDate(date: LocalDate) {
         viewModelScope.launch {
             try {
-                val activity = dailyActivityRepository.getTodayActivity()
+                val activity = if (date == Clock.System.todayIn(TimeZone.currentSystemDefault())) {
+                    dailyActivityRepository.getTodayActivity()
+                } else {
+                    dailyActivityRepository.getActivityByDate(date)
+                }
                 val goal = dailyActivityRepository.getCurrentGoal()
                 val stepGoal = goal?.stepGoal ?: 10000
-//                val stepByDate= dailyActivityRepository.getStepsByDate()
 
                 _state.update {
                     it.copy(
@@ -170,9 +175,7 @@ class HomeViewModel(
                         todayDistanceKm = activity.distanceKm
                     )
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            } catch (_: Exception) { }
         }
     }
 }

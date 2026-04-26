@@ -137,6 +137,8 @@ class OneRepMaxRepositoryImpl(
         }
     }
 
+
+
     override suspend fun deleteOneRepMax(exerciseId: Long, date: Long) {
         val userId = currentUserId ?: return
         withContext(Dispatchers.IO) {
@@ -204,6 +206,20 @@ class OneRepMaxRepositoryImpl(
                 ?.toDomain()
         }
     }
+
+//    override  suspend fun  getAllPr (exerciseId: Long):  OneRepMaxEntity?{
+//        val userId = currentUserId?: return null
+//        return withContext(Dispatchers.IO){
+//            postgrest.from(TABLE_ONE_REP_MAX)
+//                .select {
+//                    filter {
+//                        eq("user_id",userId)
+//                        eq("exercise_id",exerciseId)
+//                    }
+//                }
+//        }
+//
+//    }
 
     private fun getDateRange(date: Long): Pair<String, String> {
         val localDate = Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate()

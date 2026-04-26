@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.ghostbug.heavyliftsapp.screens.home.HomeEvent
 import com.ghostbug.heavyliftsapp.screens.user_onboarding.new_user_profile.OnboardingColors
 import com.ghostbug.heavyliftsapp.screens.user_onboarding.new_user_profile.OnboardingSectionLabel
 import com.ghostbug.heavyliftsapp.screens.user_onboarding.new_user_profile.OnboardingStepProgress
@@ -64,6 +65,7 @@ fun UserProfileScreen3(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 UserProfileUiEvent.NavToHome -> onNext()
+                UserProfileUiEvent.NavToScreen2->onBack()
                 is UserProfileUiEvent.SendSnackbar -> snackbarHostState.showSnackbar(event.message)
                 else -> {}
             }

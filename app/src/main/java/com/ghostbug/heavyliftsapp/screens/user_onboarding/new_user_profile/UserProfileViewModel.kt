@@ -339,14 +339,9 @@ class UserProfileViewModel(
                 )
                 repository.upsertProfile(profile)
 
-//                // Sync to Health Connect if possible
-//                if (healthConnectManager.checkAvailability() && s.userWeight != null) {
-//                    if (healthConnectManager.hasAllPermissions(healthConnectManager.permissions)) {
-//                        healthConnectManager.writeWeightInput(s.userWeight.toDouble())
-//                    }
-//                }
 
                 _state.update { it.copy(isLoading = false) }
+
                 _uiEvent.emit(UserProfileUiEvent.NavToHome)
             } catch (e: Exception) {
                 _state.update { it.copy(isLoading = false) }

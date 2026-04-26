@@ -19,21 +19,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.Canvas
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import java.time.DayOfWeek
-import java.time.format.TextStyle
-import java.time.temporal.TemporalAdjusters
-import java.util.Locale
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -41,8 +39,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -55,7 +53,13 @@ import com.ghostbug.heavyliftsapp.screens.signUp.SignUpEvent
 import com.ghostbug.heavyliftsapp.screens.signUp.SignUpUiEvent
 import com.ghostbug.heavyliftsapp.screens.signUp.SignUpViewModel
 import kotlinx.coroutines.launch
-import java.time.LocalDate
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 // ─── Nothing OS Design System ────────────────────────────────────────────────
 // Inspired by Nothing Phone's dot-matrix glyph interface,
@@ -88,6 +92,9 @@ private object NothingColors {
     val Negative     = Color(0xFF666666) // dim for losses
 
 }
+
+
+
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
 
@@ -123,11 +130,13 @@ fun HomeScreen(
         }
     }
 
+
+
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                homeViewModel.onEvent(HomeEvent.getSteps)
+                homeViewModel.onEvent(HomeEvent.GetSteps)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -147,14 +156,7 @@ fun HomeScreen(
     Scaffold(
         containerColor = NothingColors.Void,
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton = {
-            var today = LocalDate.now()
-            if (today==state.selectedDate) {
-                NothingFab(onClick = { homeViewModel.onEvent(HomeEvent.OnAddWorkoutClick) }, state = state)
-            }else {
-                NothingFab(onClick = { homeViewModel.onEvent(HomeEvent.message("Previous dates are read only ")) },state=state)
-            }
-        }
+
     ) { paddingValues ->
         HomeContent(
             state = state,
@@ -168,6 +170,10 @@ fun HomeScreen(
 
 // ─── Content Layout ───────────────────────────────────────────────────────────
 
+
+
+
+
 @Composable
 private fun HomeContent(
     state: HomeState,
@@ -176,6 +182,11 @@ private fun HomeContent(
     onEvent: (HomeEvent) -> Unit,
     onStepClick: () -> Unit
 ) {
+
+    val horizontalPagerState = rememberPagerState(pageCount = {2})
+    Column(modifier = Modifier.fillMaxSize()) {
+
+
     val totalWeeks = 500
     val pagerState = rememberPagerState(
         pageCount = { totalWeeks },
@@ -184,20 +195,19 @@ private fun HomeContent(
 
     val currentMonthName = remember(pagerState.currentPage) {
         val weeksAgo = (totalWeeks - 1) - pagerState.currentPage
-        val dateInDisplayedWeek = LocalDate.now().minusWeeks(weeksAgo.toLong())
-        dateInDisplayedWeek.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-            .uppercase()
+        Clock.System.todayIn(TimeZone.currentSystemDefault()).minus(weeksAgo * 7, DateTimeUnit.DAY).month.name
     }
 
     val currentYear = remember(pagerState.currentPage) {
         val weeksAgo = (totalWeeks - 1) - pagerState.currentPage
-        LocalDate.now().minusWeeks(weeksAgo.toLong()).year.toString()
+        Clock.System.todayIn(TimeZone.currentSystemDefault()).minus(weeksAgo * 7, DateTimeUnit.DAY).year.toString()
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
+            .padding(top=2.dp)
             .background(NothingColors.Void),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -222,51 +232,110 @@ private fun HomeContent(
             selectedDate = state.selectedDate,
             onDateSelected = onDateSelected
         )
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ── Activity banner ─────────────────────────────────────────────────
-        ActivityBanner(state = state, onClick = onStepClick)
 
-        Spacer(modifier = Modifier.height(20.dp))
+        HorizontalPager(
+            state = horizontalPagerState,
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.Top
+        ) { page ->
 
-        // ── Section label ───────────────────────────────────────────────────
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(4.dp, 4.dp)
-                    .background(NothingColors.GlyphRed, CircleShape)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "SESSIONS",
-                color = NothingColors.DimWhite,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 3.sp,
-                fontFamily = FontFamily.Monospace
-            )
-        }
+            when (page) {
 
-        Spacer(modifier = Modifier.height(12.dp))
+                // ── PAGE 0: Activity ───────────────────────────────
 
-        // ── Workout list ────────────────────────────────────────────────────
-        Box(modifier = Modifier.weight(1f)) {
-            when {
-                state.isLoading -> NothingLoadingIndicator()
-                state.errorMessage != null -> NothingErrorMessage(message = state.errorMessage)
-                state.workouts.isEmpty() -> NothingEmptyState()
-                else -> WorkoutList(workouts = state.workouts, onEvent = onEvent,state=state)
+                0 -> {
+                    Column {
+                        Text(
+                            text = "SWIPE TO LOG EXERCISES \u2192", // Using an arrow character
+                            style = MaterialTheme.typography.labelSmall,
+                            fontFamily = FontFamily.Monospace,
+                            color = Color.LightGray.copy(alpha = 0.6f),
+                            letterSpacing = 2.sp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp)
+                                .align(Alignment.CenterHorizontally),
+                            textAlign = TextAlign.Center
+                        )
+                        ActivityBanner(
+                            state = state,
+                            onClick = onStepClick
+                        )
+                    }
+                }
+                // ── PAGE 1: Sessions ───────────────────────────────
+
+
+                1 -> {
+                    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Section label
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(4.dp)
+                                        .background(NothingColors.GlyphRed, CircleShape)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "SESSIONS",
+                                    color = NothingColors.DimWhite,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 3.sp,
+                                    fontFamily = FontFamily.Monospace
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Box(modifier = Modifier.weight(1f)) {
+                                when {
+                                    state.isLoading -> NothingLoadingIndicator()
+                                    state.errorMessage != null -> NothingErrorMessage(
+                                        message = state.errorMessage
+                                    )
+                                    state.workouts.isEmpty() -> NothingEmptyState()
+                                    else -> WorkoutList(
+                                        workouts = state.workouts,
+                                        onEvent = onEvent,
+                                        state = state
+                                    )
+                                }
+                            }
+                        }
+
+                        // FAB overlay
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(end = 16.dp, bottom = 16.dp)
+                        ) {
+                            NothingFab(
+                                onClick = {
+                                    if (today == state.selectedDate) onEvent(HomeEvent.OnAddWorkoutClick)
+                                    else onEvent(HomeEvent.Message("Previous dates are read only"))
+                                },
+                                state = state
+                            )
+                        }
+                    }
+                }
             }
         }
     }
-}
-
+    }
+    }
 // ─── Header ──────────────────────────────────────────────────────────────────
 
 @Composable
@@ -298,7 +367,7 @@ private fun NothingHeader(
     }
 }
 
-// ─── Activity Strip ───────────────────────────────────────────────────────────
+// ─── Activity Card ────────────────────────────────────────────────────────────
 
 @Composable
 private fun ActivityBanner(
@@ -309,71 +378,142 @@ private fun ActivityBanner(
     val accentColor = if (goalReached) NothingColors.GlyphRed else NothingColors.NothingWhite
     val fill = state.stepProgress.coerceIn(0f, 1f)
 
-    Row(
+    val animatedProgress by animateFloatAsState(
+        targetValue = fill,
+        animationSpec = tween(1000),
+        label = "ringProgress"
+    )
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .height(40.dp)
-            .clickable { onClick() },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .background(NothingColors.Surface0, RoundedCornerShape(4.dp))
+            .clickable { onClick() }
+            .padding(20.dp)
     ) {
-        // glyph dot
-        Box(
-            Modifier
-                .size(4.dp)
-                .background(accentColor, CircleShape)
-        )
+        Column {
+            // Card header
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(Modifier.size(4.dp).background(accentColor, CircleShape))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "ACTIVITY",
+                    color = NothingColors.DimWhite,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 3.sp,
+                    fontFamily = FontFamily.Monospace
+                )
+                Spacer(Modifier.weight(1f))
+                Text("›", color = NothingColors.FaintWhite, fontSize = 14.sp)
+            }
 
-        // step count
-        Text(
-            text = "%,d".format(state.todaySteps),
-            color = accentColor,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Black,
-            fontFamily = FontFamily.Monospace,
-            letterSpacing = (-0.3).sp
-        )
+            Spacer(Modifier.height(16.dp))
 
-        // goal
-        Text(
-            text = "/ %,d".format(state.stepGoal),
-            color = NothingColors.FaintWhite,
-            fontSize = 10.sp,
-            fontFamily = FontFamily.Monospace
-        )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Ring progress
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.size(84.dp)) {
+                    Canvas(modifier = Modifier.size(84.dp)) {
+                        val strokeWidth = 6.dp.toPx()
+                        val inset = strokeWidth / 2f
+                        val arcSize = Size(size.width - strokeWidth, size.height - strokeWidth)
+                        val topLeft = Offset(inset, inset)
+                        drawArc(
+                            color = NothingColors.FaintWhite,
+                            startAngle = -90f,
+                            sweepAngle = 360f,
+                            useCenter = false,
+                            topLeft = topLeft,
+                            size = arcSize,
+                            style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                        )
+                        if (animatedProgress > 0f) {
+                            drawArc(
+                                color = accentColor,
+                                startAngle = -90f,
+                                sweepAngle = 360f * animatedProgress,
+                                useCenter = false,
+                                topLeft = topLeft,
+                                size = arcSize,
+                                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                            )
+                        }
+                    }
+                    Text(
+                        text = "${(fill * 100).toInt()}%",
+                        color = accentColor,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Black,
+                        fontFamily = FontFamily.Monospace
+                    )
+                }
 
-        // progress bar — fills remaining space
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(2.dp)
-                .background(NothingColors.FaintWhite, RoundedCornerShape(1.dp))
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(fill)
-                    .height(2.dp)
-                    .background(accentColor, RoundedCornerShape(1.dp))
-            )
+                Spacer(Modifier.width(20.dp))
+
+                Column {
+                    Text(
+                        text = "%,d".format(state.todaySteps),
+                        color = NothingColors.NothingWhite,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Black,
+                        fontFamily = FontFamily.Monospace,
+                        letterSpacing = (-1).sp
+                    )
+                    Text(
+                        text = "of %,d steps".format(state.stepGoal),
+                        color = NothingColors.DimWhite,
+                        fontSize = 9.sp,
+                        fontFamily = FontFamily.Monospace,
+                        letterSpacing = 1.sp
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        if (state.todayCalories > 0f) {
+                            Column {
+                                Text(
+                                    text = "${state.todayCalories.toInt()}",
+                                    color = NothingColors.OffWhite,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = FontFamily.Monospace
+                                )
+                                Text(
+                                    text = "KCAL",
+                                    color = NothingColors.DimWhite,
+                                    fontSize = 8.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                    letterSpacing = 2.sp
+                                )
+                            }
+                        }
+                        if (state.todayDistanceKm > 0f) {
+                            Column {
+                                Text(
+                                    text = "%.1f".format(state.todayDistanceKm),
+                                    color = NothingColors.OffWhite,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = FontFamily.Monospace
+                                )
+                                Text(
+                                    text = "KM",
+                                    color = NothingColors.DimWhite,
+                                    fontSize = 8.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                    letterSpacing = 2.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
-
-        // calories (only if non-zero)
-        if (state.todayCalories > 0f) {
-            Text(
-                text = "${state.todayCalories.toInt()} kcal",
-                color = NothingColors.FaintWhite,
-                fontSize = 9.sp,
-                fontFamily = FontFamily.Monospace
-            )
-        }
-
-        // chevron
-        Text(
-            text = "›",
-            color = NothingColors.FaintWhite,
-            fontSize = 14.sp
-        )
     }
 }
 
@@ -495,9 +635,8 @@ private fun WeeklyCalendar(
         verticalAlignment = Alignment.Top
     ) { page ->
         val weeksAgo = (totalWeeks - 1) - page
-        val mondayOfWeek = LocalDate.now()
-            .minusWeeks(weeksAgo.toLong())
-            .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        val dateInWeek = Clock.System.todayIn(TimeZone.currentSystemDefault()).minus(weeksAgo * 7, DateTimeUnit.DAY)
+        val mondayOfWeek = dateInWeek.minus(dateInWeek.dayOfWeek.ordinal, DateTimeUnit.DAY)
 
         WeekRow(
             startDate = mondayOfWeek,
@@ -513,6 +652,7 @@ private fun WeekRow(
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit
 ) {
+    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -520,12 +660,12 @@ private fun WeekRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         for (i in 0..6) {
-            val date = startDate.plusDays(i.toLong())
+            val date = startDate.plus(i, DateTimeUnit.DAY)
             NothingDateItem(
                 date = date,
-                isToday = date == LocalDate.now(),
+                isToday = date == today,
                 isSelected = date == selectedDate,
-                isFuture = date.isAfter(LocalDate.now()),
+                isFuture = date > today,
                 onDateSelected = onDateSelected
             )
         }
@@ -540,12 +680,8 @@ private fun NothingDateItem(
     isFuture: Boolean,
     onDateSelected: (LocalDate) -> Unit
 ) {
-    val configuration = LocalConfiguration.current
-    val locale = configuration.locales[0]
-    val dayName = date.dayOfWeek.getDisplayName(TextStyle.SHORT, locale)
-        .take(1) // Single letter — Nothing's minimal style
-        .uppercase()
-    val dayNumber = date.dayOfMonth.toString()
+    val dayName = date.dayOfWeek.name.take(1)
+    val dayNumber = date.day.toString()
 
     val bgColor by animateColorAsState(
         targetValue = when {
@@ -618,7 +754,7 @@ private fun NothingDateItem(
 
 @Composable
 private fun NothingFab(onClick: () -> Unit,state: HomeState) {
-    var today = LocalDate.now()
+    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     if (today==state.selectedDate) {
         FloatingActionButton(
             onClick = onClick,
@@ -676,7 +812,7 @@ fun WorkoutList(
     LaunchedEffect(workouts.size) {
         if (workouts.isNotEmpty()) listState.animateScrollToItem(workouts.lastIndex)
     }
-    var today = LocalDate.now()
+    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     LazyColumn(
         state = listState,
         modifier = modifier.fillMaxSize(),
@@ -694,7 +830,7 @@ fun WorkoutList(
                   if (today==state.selectedDate) {
                       { onEvent(HomeEvent.EditWorkout(workout.exercise.id)) }
                   }else {
-                      { onEvent(HomeEvent.message("Previous dates are read only ")) }
+                      { onEvent(HomeEvent.Message("Previous dates are read only ")) }
                   }
             )
 
@@ -868,7 +1004,7 @@ private fun NothingWorkoutCard(
 
 
                 // Edit button
-                val  today = LocalDate.now()
+                val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
                 if (today == state.selectedDate) {
                     Box(
                         modifier = Modifier
