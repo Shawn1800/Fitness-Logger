@@ -9,6 +9,7 @@ interface UserProfileRepository {
     suspend fun upsertProfile(profile: UserProfileEntity)
     suspend fun deleteOwnProfile()
     suspend fun isUserNameTaken(userName: String): Boolean
+    suspend fun isProfileComplete(): Boolean
 
      fun getGoogleProfilePic(): String?
 }

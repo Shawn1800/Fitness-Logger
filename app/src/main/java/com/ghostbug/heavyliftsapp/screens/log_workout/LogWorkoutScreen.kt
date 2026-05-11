@@ -56,24 +56,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-
-// ─── Nothing OS Design System ─────────────────────────────────────────────────
-
-private object NothingColors {
-    val Void         = Color(0xFF0A0A0A)
-    val Surface0     = Color(0xFF111111)
-    val Surface1     = Color(0xFF1A1A1A)
-    val Hairline     = Color(0xFF2C2C2C)
-    val StrokeWeak   = Color(0xFF1E1E1E)
-    val NothingWhite = Color(0xFFFFFFFF)
-    val DimWhite     = Color(0xFF8A8A8A)
-    val FaintWhite   = Color(0xFF3A3A3A)
-    val GlyphRed     = Color(0xFFFF3A3A)
-    val DangerDim    = Color(0xFF2A1010)
-}
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsColors
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsType
 
 private fun Modifier.dotMatrixBackground(
-    dotColor: Color = NothingColors.FaintWhite.copy(alpha = 0.12f),
+    dotColor: Color = HeavyLiftsColors.BgChip.copy(alpha = 0.12f),
     spacing: Float = 14f,
     radius: Float = 1.1f
 ): Modifier = this.drawBehind {
@@ -118,7 +105,7 @@ fun LogWorkoutScreen(
     }
 
     Scaffold(
-        containerColor = NothingColors.Void,
+        containerColor = HeavyLiftsColors.Bg,
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         NothingLogWorkoutContent(
@@ -152,7 +139,7 @@ fun NothingLogWorkoutContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(NothingColors.Void)
+                .background(HeavyLiftsColors.Bg)
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = 100.dp)
         ) {
@@ -162,7 +149,7 @@ fun NothingLogWorkoutContent(
             // ── Exercise heading ──────────────────────────────────────
             NothingExerciseHeading(exerciseName = state.exercise?.exerciseName ?: "")
 
-            HorizontalDivider(color = NothingColors.Hairline, thickness = 0.5.dp)
+            HorizontalDivider(color = HeavyLiftsColors.BorderSubtle, thickness = 0.5.dp)
 
             // ── "Add Set N" label ─────────────────────────────────────
             NothingSetSectionLabel(
@@ -201,7 +188,7 @@ fun NothingLogWorkoutContent(
             if (state.sets.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(24.dp))
 
-                HorizontalDivider(color = NothingColors.Hairline, thickness = 0.5.dp)
+                HorizontalDivider(color = HeavyLiftsColors.BorderSubtle, thickness = 0.5.dp)
 
                 NothingSetSectionLabel(
                     label = "LOGGED SETS",
@@ -215,7 +202,7 @@ fun NothingLogWorkoutContent(
                         onDeleteSet = { onEvent(LogWorkoutEvent.DeleteSet(setItem.id)) }
                     )
                     HorizontalDivider(
-                        color = NothingColors.StrokeWeak,
+                        color = HeavyLiftsColors.BorderSubtle,
                         thickness = 0.5.dp,
                         modifier = Modifier.padding(horizontal = 20.dp)
                     )
@@ -248,7 +235,7 @@ private fun NothingLogTopBar(onBack: () -> Unit) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
-                tint = NothingColors.DimWhite,
+                tint = HeavyLiftsColors.Fg3,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -258,9 +245,9 @@ private fun NothingLogTopBar(onBack: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Box(Modifier.size(5.dp).background(NothingColors.GlyphRed, CircleShape))
-            Box(Modifier.size(4.dp).background(NothingColors.FaintWhite, CircleShape))
-            Box(Modifier.size(4.dp).background(NothingColors.FaintWhite, CircleShape))
+            Box(Modifier.size(5.dp).background(HeavyLiftsColors.Accent, CircleShape))
+            Box(Modifier.size(4.dp).background(HeavyLiftsColors.BgChip, CircleShape))
+            Box(Modifier.size(4.dp).background(HeavyLiftsColors.BgChip, CircleShape))
         }
     }
 }
@@ -274,15 +261,15 @@ private fun NothingExerciseHeading(exerciseName: String) {
     ) {
         Text(
             text = "LOG",
-            color = NothingColors.DimWhite,
+            color = HeavyLiftsColors.Fg3,
             fontSize = 10.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 3.sp,
-            fontFamily = FontFamily.Monospace
+            fontFamily = HeavyLiftsType.Display
         )
         Text(
             text = exerciseName.uppercase(),
-            color = NothingColors.NothingWhite,
+            color = HeavyLiftsColors.Fg1,
             fontWeight = FontWeight.Black,
             fontSize = 26.sp,
             letterSpacing = (-0.5).sp,
@@ -310,27 +297,27 @@ private fun NothingSetSectionLabel(
             Box(
                 modifier = Modifier
                     .size(4.dp)
-                    .background(NothingColors.GlyphRed, CircleShape)
+                    .background(HeavyLiftsColors.Accent, CircleShape)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = if (number != null) "$label $number" else label,
-                color = NothingColors.DimWhite,
+                color = HeavyLiftsColors.Fg3,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 3.sp,
-                fontFamily = FontFamily.Monospace
+                fontFamily = HeavyLiftsType.Display
             )
         }
 
         count?.let {
             Text(
                 text = "$it TOTAL",
-                color = NothingColors.FaintWhite,
+                color = HeavyLiftsColors.BgChip,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 2.sp,
-                fontFamily = FontFamily.Monospace
+                fontFamily = HeavyLiftsType.Display
             )
         }
     }
@@ -359,16 +346,16 @@ fun NothingSetRow(
         Box(
             modifier = Modifier
                 .size(36.dp)
-                .background(NothingColors.Surface1, RoundedCornerShape(3.dp))
-                .border(0.5.dp, NothingColors.Hairline, RoundedCornerShape(3.dp)),
+                .background(HeavyLiftsColors.BgChip, RoundedCornerShape(12.dp))
+                .border(0.5.dp, HeavyLiftsColors.BorderSubtle, RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = setNumber.toString().padStart(2, '0'),
-                color = NothingColors.DimWhite,
+                color = HeavyLiftsColors.Fg3,
                 fontWeight = FontWeight.Bold,
                 fontSize = 12.sp,
-                fontFamily = FontFamily.Monospace
+                fontFamily = HeavyLiftsType.Display
             )
         }
 
@@ -397,13 +384,13 @@ fun NothingSetRow(
             onClick = onDeleteSet,
             modifier = Modifier
                 .size(36.dp)
-                .clip(RoundedCornerShape(3.dp))
-                .background(NothingColors.DangerDim)
+                .clip(RoundedCornerShape(12.dp))
+                .background(HeavyLiftsColors.AccentSoft)
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = "Delete set",
-                tint = NothingColors.GlyphRed,
+                tint = HeavyLiftsColors.Accent,
                 modifier = Modifier.size(16.dp)
             )
         }
@@ -450,26 +437,26 @@ private fun NothingInputField(
                 text = label,
                 fontSize = 9.sp,
                 letterSpacing = 2.sp,
-                fontFamily = FontFamily.Monospace
+                fontFamily = HeavyLiftsType.Display
             )
         },
         singleLine = true,
         // Sharp 3dp corners — Nothing's terminal aesthetic
-        shape = RoundedCornerShape(3.dp),
+        shape = RoundedCornerShape(12.dp),
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
             imeAction = imeAction
         ),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor        = NothingColors.NothingWhite,
-            unfocusedTextColor      = NothingColors.NothingWhite,
-            focusedBorderColor      = NothingColors.NothingWhite,
-            unfocusedBorderColor    = NothingColors.Hairline,
-            focusedLabelColor       = NothingColors.DimWhite,
-            unfocusedLabelColor     = NothingColors.FaintWhite,
-            cursorColor             = NothingColors.GlyphRed,
-            focusedContainerColor   = NothingColors.Surface0,
-            unfocusedContainerColor = NothingColors.Surface0,
+            focusedTextColor        = HeavyLiftsColors.Fg1,
+            unfocusedTextColor      = HeavyLiftsColors.Fg1,
+            focusedBorderColor      = HeavyLiftsColors.Fg1,
+            unfocusedBorderColor    = HeavyLiftsColors.BorderSubtle,
+            focusedLabelColor       = HeavyLiftsColors.Fg3,
+            unfocusedLabelColor     = HeavyLiftsColors.BgChip,
+            cursorColor             = HeavyLiftsColors.Accent,
+            focusedContainerColor   = HeavyLiftsColors.BgElevated,
+            unfocusedContainerColor = HeavyLiftsColors.BgElevated,
         )
     )
 }
@@ -483,11 +470,11 @@ private fun NothingAddSetButton(onClick: () -> Unit) {
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .height(48.dp)
-            .background(NothingColors.Surface1, RoundedCornerShape(3.dp))
-            .border(0.5.dp, NothingColors.Hairline, RoundedCornerShape(3.dp))
+            .background(HeavyLiftsColors.BgChip, RoundedCornerShape(12.dp))
+            .border(0.5.dp, HeavyLiftsColors.BorderSubtle, RoundedCornerShape(12.dp))
             // Tap handled by clickable on the scaffold row — wire through onClick
             .dotMatrixBackground(
-                dotColor = NothingColors.FaintWhite.copy(alpha = 0.08f),
+                dotColor = HeavyLiftsColors.BgChip.copy(alpha = 0.08f),
                 spacing = 10f,
                 radius = 0.9f
             ),
@@ -497,22 +484,22 @@ private fun NothingAddSetButton(onClick: () -> Unit) {
         androidx.compose.material3.TextButton(
             onClick = onClick,
             modifier = Modifier.fillMaxSize(),
-            shape = RoundedCornerShape(3.dp)
+            shape = RoundedCornerShape(12.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = null,
-                tint = NothingColors.NothingWhite,
+                tint = HeavyLiftsColors.Fg1,
                 modifier = Modifier.size(14.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "ADD SET",
-                color = NothingColors.NothingWhite,
+                color = HeavyLiftsColors.Fg1,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 3.sp,
-                fontFamily = FontFamily.Monospace
+                fontFamily = HeavyLiftsType.Display
             )
         }
     }
@@ -525,9 +512,9 @@ fun NothingSaveFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
     ExtendedFloatingActionButton(
         onClick = onClick,
         modifier = modifier,
-        containerColor = NothingColors.NothingWhite,
-        contentColor = NothingColors.Void,
-        shape = RoundedCornerShape(4.dp),
+        containerColor = HeavyLiftsColors.Fg1,
+        contentColor = HeavyLiftsColors.Bg,
+        shape = RoundedCornerShape(20.dp),
         // No elevation — Nothing OS is flat
         elevation = FloatingActionButtonDefaults.elevation(
             defaultElevation = 0.dp,
@@ -537,7 +524,7 @@ fun NothingSaveFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
         Icon(
             imageVector = Icons.Default.Check,
             contentDescription = "Save workout",
-            tint = NothingColors.Void,
+            tint = HeavyLiftsColors.Bg,
             modifier = Modifier.size(16.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
@@ -546,8 +533,8 @@ fun NothingSaveFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
             fontWeight = FontWeight.Black,
             fontSize = 11.sp,
             letterSpacing = 3.sp,
-            fontFamily = FontFamily.Monospace,
-            color = NothingColors.Void
+            fontFamily = HeavyLiftsType.Display,
+            color = HeavyLiftsColors.Bg
         )
     }
 }

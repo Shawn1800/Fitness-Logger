@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ghostbug.heavyliftsapp.data.domain.Gender
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsColors
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -67,7 +68,7 @@ fun UserProfileScreen2(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(OnboardingColors.Void)
+            .background(HeavyLiftsColors.Bg)
             .dotMatrix()
     ) {
         SnackbarHost(
@@ -92,7 +93,7 @@ fun UserProfileScreen2(
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = OnboardingColors.DimWhite
+                        tint = HeavyLiftsColors.Fg3
                     )
                 }
                 Spacer(Modifier.weight(1f))
@@ -103,7 +104,7 @@ fun UserProfileScreen2(
 
             Text(
                 text = "BODY STATS.",
-                color = OnboardingColors.NothingWhite,
+                color = HeavyLiftsColors.Fg1,
                 fontSize = 34.sp,
                 fontWeight = FontWeight.Black,
                 lineHeight = 38.sp,
@@ -115,7 +116,7 @@ fun UserProfileScreen2(
 
             Text(
                 text = "helps us calculate your calories accurately.",
-                color = OnboardingColors.DimWhite,
+                color = HeavyLiftsColors.Fg3,
                 fontSize = 11.sp,
                 fontFamily = FontFamily.Monospace,
                 letterSpacing = 0.5.sp
@@ -223,14 +224,14 @@ fun UserProfileScreen2(
                     Box(
                         modifier = Modifier
                             .background(
-                                color = if (selected) OnboardingColors.NothingWhite
+                                color = if (selected) HeavyLiftsColors.Fg1
                                 else Color.Transparent,
                                 shape = RoundedCornerShape(2.dp)
                             )
                             .border(
                                 width = 1.dp,
-                                color = if (selected) OnboardingColors.NothingWhite
-                                else OnboardingColors.Hairline,
+                                color = if (selected) HeavyLiftsColors.Fg1
+                                else HeavyLiftsColors.BorderSubtle,
                                 shape = RoundedCornerShape(2.dp)
                             )
                             .clickable { viewModel.onEvent(UserProfileEvent.OnGenderChanged(gender)) }
@@ -239,7 +240,7 @@ fun UserProfileScreen2(
                     ) {
                         Text(
                             text = label,
-                            color = if (selected) OnboardingColors.Void else OnboardingColors.DimWhite,
+                            color = if (selected) HeavyLiftsColors.Bg else HeavyLiftsColors.Fg3,
                             fontSize = 11.sp,
                             fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
                             fontFamily = FontFamily.Monospace,
@@ -260,13 +261,13 @@ fun UserProfileScreen2(
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)
-                        .border(1.dp, OnboardingColors.Hairline, RoundedCornerShape(2.dp))
+                        .border(1.dp, HeavyLiftsColors.BorderSubtle, RoundedCornerShape(2.dp))
                         .clickable { onBack() },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "BACK",
-                        color = OnboardingColors.DimWhite,
+                        color = HeavyLiftsColors.Fg3,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 3.sp,
@@ -278,13 +279,13 @@ fun UserProfileScreen2(
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)
-                        .background(OnboardingColors.NothingWhite, RoundedCornerShape(2.dp))
+                        .background(HeavyLiftsColors.Fg1, RoundedCornerShape(2.dp))
                         .clickable { viewModel.onEvent(UserProfileEvent.NavtoScreen3) },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "CONTINUE",
-                        color = OnboardingColors.Void,
+                        color = HeavyLiftsColors.Bg,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 3.sp,

@@ -1,4 +1,4 @@
-package com.ghostbug.heavyliftsapp.screens.Profile
+package com.ghostbug.heavyliftsapp.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -52,27 +52,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ghostbug.heavyliftsapp.data.domain.ExerciseEntity
-
-// ─── Nothing OS Design System ─────────────────────────────────────────────────
-
-private object NothingColors {
-    val Void         = Color(0xFF0A0A0A)
-    val Surface0     = Color(0xFF111111)
-    val Surface1     = Color(0xFF1A1A1A)
-    val Surface2     = Color(0xFF222222)
-    val Hairline     = Color(0xFF2C2C2C)
-    val StrokeWeak   = Color(0xFF1E1E1E)
-    val NothingWhite = Color(0xFFFFFFFF)
-    val OffWhite     = Color(0xFFE8E8E8)
-    val DimWhite     = Color(0xFF8A8A8A)
-    val FaintWhite   = Color(0xFF3A3A3A)
-    val GlyphRed     = Color(0xFFFF3A3A)
-    val GlyphRedDim  = Color(0xFF3A1010)
-}
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsColors
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsType
 
 // Dot-matrix canvas background — Nothing's signature texture
 private fun Modifier.dotMatrixBackground(
-    dotColor: Color = NothingColors.FaintWhite.copy(alpha = 0.15f),
+    dotColor: Color = HeavyLiftsColors.BgChip.copy(alpha = 0.15f),
     spacing: Float = 14f,
     radius: Float = 1.1f
 ): Modifier = this.drawBehind {
@@ -111,7 +96,7 @@ fun ExerciseSelectionScreen(
     }
 
     Scaffold(
-        containerColor = NothingColors.Void,
+        containerColor = HeavyLiftsColors.Bg,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
@@ -156,7 +141,7 @@ fun NothingSearchLayout(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NothingColors.Void)
+            .background(HeavyLiftsColors.Bg)
     ) {
         // ── Top bar ───────────────────────────────────────────────
         NothingTopBar(onBack = onBack)
@@ -173,7 +158,7 @@ fun NothingSearchLayout(
         Spacer(modifier = Modifier.height(8.dp))
 
         // ── Section label row ─────────────────────────────────────
-        HorizontalDivider(color = NothingColors.Hairline, thickness = 0.5.dp)
+        HorizontalDivider(color = HeavyLiftsColors.BorderSubtle, thickness = 0.5.dp)
 
         NothingSectionLabel(
             label = "EXERCISES",
@@ -208,7 +193,7 @@ private fun NothingTopBar(onBack: () -> Unit) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
-                tint = NothingColors.DimWhite,
+                tint = HeavyLiftsColors.Fg3,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -223,17 +208,17 @@ private fun NothingTopBar(onBack: () -> Unit) {
             Box(
                 modifier = Modifier
                     .size(5.dp)
-                    .background(NothingColors.GlyphRed, CircleShape)
+                    .background(HeavyLiftsColors.Accent, CircleShape)
             )
             Box(
                 modifier = Modifier
                     .size(4.dp)
-                    .background(NothingColors.FaintWhite, CircleShape)
+                    .background(HeavyLiftsColors.BgChip, CircleShape)
             )
             Box(
                 modifier = Modifier
                     .size(4.dp)
-                    .background(NothingColors.FaintWhite, CircleShape)
+                    .background(HeavyLiftsColors.BgChip, CircleShape)
             )
         }
     }
@@ -248,15 +233,15 @@ private fun NothingPageHeading(resultCount: Int?) {
     ) {
         Text(
             text = "SELECT",
-            color = NothingColors.DimWhite,
+            color = HeavyLiftsColors.Fg3,
             fontSize = 10.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 3.sp,
-            fontFamily = FontFamily.Monospace
+            fontFamily = HeavyLiftsType.Display
         )
         Text(
             text = "EXERCISE",
-            color = NothingColors.NothingWhite,
+            color = HeavyLiftsColors.Fg1,
             fontWeight = FontWeight.Black,
             fontSize = 30.sp,
             letterSpacing = (-1).sp,
@@ -281,9 +266,9 @@ private fun NothingSearchField(
         placeholder = {
             Text(
                 text = "SEARCH_",
-                color = NothingColors.FaintWhite,
+                color = HeavyLiftsColors.BgChip,
                 fontSize = 13.sp,
-                fontFamily = FontFamily.Monospace,
+                fontFamily = HeavyLiftsType.Display,
                 letterSpacing = 1.sp
             )
         },
@@ -291,7 +276,7 @@ private fun NothingSearchField(
             Icon(
                 Icons.Default.Search,
                 contentDescription = null,
-                tint = NothingColors.DimWhite,
+                tint = HeavyLiftsColors.Fg3,
                 modifier = Modifier.size(18.dp)
             )
         },
@@ -301,7 +286,7 @@ private fun NothingSearchField(
                     Icon(
                         Icons.Default.Clear,
                         contentDescription = "Clear",
-                        tint = NothingColors.DimWhite,
+                        tint = HeavyLiftsColors.Fg3,
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -309,15 +294,15 @@ private fun NothingSearchField(
         },
         singleLine = true,
         // Sharp corners — Nothing OS never rounds search bars heavily
-        shape = RoundedCornerShape(3.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor        = NothingColors.NothingWhite,
-            unfocusedTextColor      = NothingColors.NothingWhite,
-            focusedBorderColor      = NothingColors.NothingWhite,
-            unfocusedBorderColor    = NothingColors.Hairline,
-            cursorColor             = NothingColors.GlyphRed,
-            focusedContainerColor   = NothingColors.Surface0,
-            unfocusedContainerColor = NothingColors.Surface0,
+            focusedTextColor        = HeavyLiftsColors.Fg1,
+            unfocusedTextColor      = HeavyLiftsColors.Fg1,
+            focusedBorderColor      = HeavyLiftsColors.Fg1,
+            unfocusedBorderColor    = HeavyLiftsColors.BorderSubtle,
+            cursorColor             = HeavyLiftsColors.Accent,
+            focusedContainerColor   = HeavyLiftsColors.BgElevated,
+            unfocusedContainerColor = HeavyLiftsColors.BgElevated,
         )
     )
 }
@@ -337,27 +322,27 @@ private fun NothingSectionLabel(label: String, count: Int?) {
             Box(
                 modifier = Modifier
                     .size(4.dp)
-                    .background(NothingColors.GlyphRed, CircleShape)
+                    .background(HeavyLiftsColors.Accent, CircleShape)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = label,
-                color = NothingColors.DimWhite,
+                color = HeavyLiftsColors.Fg3,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 3.sp,
-                fontFamily = FontFamily.Monospace
+                fontFamily = HeavyLiftsType.Display
             )
         }
 
         count?.let {
             Text(
                 text = "$it FOUND",
-                color = NothingColors.FaintWhite,
+                color = HeavyLiftsColors.BgChip,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 2.sp,
-                fontFamily = FontFamily.Monospace
+                fontFamily = HeavyLiftsType.Display
             )
         }
     }
@@ -382,7 +367,7 @@ fun NothingExerciseList(
                 onClickExercise = { onClickExercise(exercise) }
             )
             HorizontalDivider(
-                color = NothingColors.StrokeWeak,
+                color = HeavyLiftsColors.BorderSubtle,
                 thickness = 0.5.dp
             )
         }
@@ -409,7 +394,7 @@ private fun NothingExerciseItem(
             modifier = Modifier
                 .width(2.dp)
                 .height(32.dp)
-                .background(NothingColors.FaintWhite, RoundedCornerShape(1.dp))
+                .background(HeavyLiftsColors.BgChip, RoundedCornerShape(1.dp))
         )
 
         Spacer(modifier = Modifier.width(14.dp))
@@ -418,22 +403,22 @@ private fun NothingExerciseItem(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = exercise.exerciseName.uppercase(),
-                color = NothingColors.NothingWhite,
+                color = HeavyLiftsColors.Fg1,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 0.5.sp,
-                fontFamily = FontFamily.Monospace,
+                fontFamily = HeavyLiftsType.Display,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(3.dp))
             Text(
                 text = exercise.category.uppercase(),
-                color = NothingColors.DimWhite,
+                color = HeavyLiftsColors.Fg3,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Normal,
                 letterSpacing = 2.sp,
-                fontFamily = FontFamily.Monospace
+                fontFamily = HeavyLiftsType.Display
             )
         }
 
@@ -444,15 +429,15 @@ private fun NothingExerciseItem(
             modifier = Modifier
                 .size(32.dp)
                 .background(Color.Transparent)
-                .clip(RoundedCornerShape(3.dp))
-                .background(NothingColors.Surface1)
+                .clip(RoundedCornerShape(12.dp))
+                .background(HeavyLiftsColors.BgChip)
                 .clickable { onClickExercise() },
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = "Add exercise",
-                tint = NothingColors.NothingWhite,
+                tint = HeavyLiftsColors.Fg1,
                 modifier = Modifier.size(16.dp)
             )
         }
@@ -466,17 +451,17 @@ private fun NothingLoadingIndicator() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(
-                color = NothingColors.NothingWhite,
+                color = HeavyLiftsColors.Fg1,
                 strokeWidth = 1.5.dp,
                 modifier = Modifier.size(22.dp)
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = "SEARCHING",
-                color = NothingColors.FaintWhite,
+                color = HeavyLiftsColors.BgChip,
                 fontSize = 9.sp,
                 letterSpacing = 3.sp,
-                fontFamily = FontFamily.Monospace
+                fontFamily = HeavyLiftsType.Display
             )
         }
     }
@@ -504,17 +489,17 @@ private fun NothingEmptyState(hasQuery: Boolean) {
                 Box(
                     modifier = Modifier
                         .size(5.dp)
-                        .background(NothingColors.FaintWhite, CircleShape)
+                        .background(HeavyLiftsColors.BgChip, CircleShape)
                 )
                 Box(
                     modifier = Modifier
                         .size(5.dp)
-                        .background(NothingColors.GlyphRed, CircleShape)
+                        .background(HeavyLiftsColors.Accent, CircleShape)
                 )
                 Box(
                     modifier = Modifier
                         .size(5.dp)
-                        .background(NothingColors.FaintWhite, CircleShape)
+                        .background(HeavyLiftsColors.BgChip, CircleShape)
                 )
             }
 
@@ -522,19 +507,19 @@ private fun NothingEmptyState(hasQuery: Boolean) {
 
             Text(
                 text = if (hasQuery) "NO MATCH" else "NO EXERCISES",
-                color = NothingColors.NothingWhite,
+                color = HeavyLiftsColors.Fg1,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 3.sp,
-                fontFamily = FontFamily.Monospace
+                fontFamily = HeavyLiftsType.Display
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = if (hasQuery) "TRY A DIFFERENT TERM" else "DATABASE EMPTY",
-                color = NothingColors.FaintWhite,
+                color = HeavyLiftsColors.BgChip,
                 fontSize = 9.sp,
                 letterSpacing = 2.sp,
-                fontFamily = FontFamily.Monospace,
+                fontFamily = HeavyLiftsType.Display,
                 textAlign = TextAlign.Center
             )
         }
@@ -550,23 +535,23 @@ private fun NothingErrorMessage(message: String) {
             Box(
                 modifier = Modifier
                     .size(5.dp)
-                    .background(NothingColors.GlyphRed, CircleShape)
+                    .background(HeavyLiftsColors.Accent, CircleShape)
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = "ERROR",
-                color = NothingColors.GlyphRed,
+                color = HeavyLiftsColors.Accent,
                 fontSize = 9.sp,
                 letterSpacing = 3.sp,
-                fontFamily = FontFamily.Monospace,
+                fontFamily = HeavyLiftsType.Display,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = message.uppercase(),
-                color = NothingColors.DimWhite,
+                color = HeavyLiftsColors.Fg3,
                 fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace,
+                fontFamily = HeavyLiftsType.Display,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.dp),
                 lineHeight = 18.sp

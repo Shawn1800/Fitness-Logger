@@ -1,7 +1,17 @@
 package com.ghostbug.heavyliftsapp.screens.signUp
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,14 +20,32 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,41 +53,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsColors
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsType
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-
-// ─── Nothing OS Design System ─────────────────────────────────────────────────
-
-private object NothingColors {
-    val Void         = Color(0xFF0A0A0A)
-    val Surface0     = Color(0xFF111111)
-    val Surface1     = Color(0xFF1A1A1A)
-    val Hairline     = Color(0xFF2C2C2C)
-    val NothingWhite = Color(0xFFFFFFFF)
-    val DimWhite     = Color(0xFF8A8A8A)
-    val FaintWhite   = Color(0xFF3A3A3A)
-    val GlyphRed     = Color(0xFFFF3A3A)
-}
-
-private fun Modifier.dotMatrixBackground(
-    dotColor: Color = NothingColors.FaintWhite.copy(alpha = 0.13f),
-    spacing: Float = 14f,
-    radius: Float = 1.1f
-): Modifier = this.drawBehind {
-    val cols = (size.width / spacing).toInt() + 1
-    val rows = (size.height / spacing).toInt() + 1
-    for (col in 0..cols) {
-        for (row in 0..rows) {
-            drawCircle(
-                color = dotColor,
-                radius = radius,
-                center = Offset(col * spacing, row * spacing)
-            )
-        }
-    }
-}
-
-// ─── Screen ───────────────────────────────────────────────────────────────────
 
 @Composable
 fun SignUpScreen(
@@ -76,328 +73,252 @@ fun SignUpScreen(
     LaunchedEffect(Unit) {
         uiEvent.collect { event ->
             when (event) {
-                is SignUpUiEvent.NavigateToSignIn -> {
-                    onNavigateToSignIn()
-                }
+                is SignUpUiEvent.NavigateToSignIn -> onNavigateToSignIn()
                 is SignUpUiEvent.NavToScreen1 -> {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar("ACCOUNT CREATED")
-                    }
+                    coroutineScope.launch { snackbarHostState.showSnackbar("Account created. Welcome.") }
                     onNavigateToUserProfileScreen1()
                 }
-                is SignUpUiEvent.ShowError -> {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(event.message)
-                    }
-                }
-
-                SignUpUiEvent.NavigateToHome -> TODO()
-                SignUpUiEvent.NavigateToOnboarding -> TODO()
+                is SignUpUiEvent.ShowError ->
+                    coroutineScope.launch { snackbarHostState.showSnackbar(event.message) }
+                SignUpUiEvent.NavigateToHome -> { /* unused */ }
+                SignUpUiEvent.NavigateToOnboarding -> { /* unused */ }
             }
         }
     }
 
     Scaffold(
-        containerColor = NothingColors.Void,
+        containerColor = HeavyLiftsColors.Bg,
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(NothingColors.Void)
+                .background(HeavyLiftsColors.Bg)
+                .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Dot matrix panel — upper half atmosphere
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.45f)
-                    .dotMatrixBackground()
+            Spacer(Modifier.height(56.dp))
+            BrandMark()
+
+            Spacer(Modifier.height(24.dp))
+            Text(
+                text = "Create your account",
+                color = HeavyLiftsColors.Fg1,
+                fontFamily = HeavyLiftsType.Display,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = "Track your lifts. Watch your 1RM climb.",
+                color = HeavyLiftsColors.Fg3,
+                fontFamily = HeavyLiftsType.Body,
+                fontSize = 14.sp
             )
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 28.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(modifier = Modifier.height(48.dp))
+            Spacer(Modifier.height(36.dp))
 
-                NothingRegisterGlyphMark()
+            HLLabel("Email")
+            HLField(
+                value = state.email,
+                onValueChange = { onEvent(SignUpEvent.OnEmailChange(it)) },
+                placeholder = "you@example.com",
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next,
+                trailingIcon = null
+            )
 
-                Spacer(modifier = Modifier.height(32.dp))
+            Spacer(Modifier.height(14.dp))
 
-                NothingRegisterHeading()
-
-                Spacer(modifier = Modifier.height(44.dp))
-
-                NothingInputField(
-                    value = state.email,
-                    onValueChange = { onEvent(SignUpEvent.OnEmailChange(it)) },
-                    label = "EMAIL",
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next,
-                    trailingIcon = null
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                NothingInputField(
-                    value = state.password,
-                    onValueChange = { onEvent(SignUpEvent.OnPasswordChange(it)) },
-                    label = "PASSWORD",
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done,
-                    visualTransformation = if (passwordVisible)
-                        VisualTransformation.None
-                    else
-                        PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(
-                                imageVector = if (passwordVisible)
-                                    Icons.Filled.Visibility
-                                else
-                                    Icons.Filled.VisibilityOff,
-                                contentDescription = null,
-                                tint = NothingColors.DimWhite,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
+            HLLabel("Password")
+            HLField(
+                value = state.password,
+                onValueChange = { onEvent(SignUpEvent.OnPasswordChange(it)) },
+                placeholder = "At least 6 characters",
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done,
+                visualTransformation = if (passwordVisible)
+                    VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            imageVector = if (passwordVisible)
+                                Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                            contentDescription = null,
+                            tint = HeavyLiftsColors.Fg3,
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
+                }
+            )
+
+            Spacer(Modifier.height(28.dp))
+
+            CreateAccountPill(
+                isLoading = state.isLoading,
+                onClick = { onEvent(SignUpEvent.OnSignUpClick) }
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Already lifting?",
+                    color = HeavyLiftsColors.Fg3,
+                    fontFamily = HeavyLiftsType.Body,
+                    fontSize = 13.sp
                 )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(3.dp)
-                            .background(NothingColors.FaintWhite, CircleShape)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
+                TextButton(onClick = { onEvent(SignUpEvent.OnNavigateToSignIn) }) {
                     Text(
-                        text = "MIN 6 CHARACTERS",
-                        color = NothingColors.FaintWhite,
-                        fontSize = 8.sp,
-                        letterSpacing = 2.sp,
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold
+                        text = "Sign in",
+                        color = HeavyLiftsColors.Accent,
+                        fontFamily = HeavyLiftsType.Display,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                NothingCreateAccountButton(
-                    isLoading = state.isLoading,
-                    onClick = { onEvent(SignUpEvent.OnSignUpClick) }
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                NothingSignInLink(
-                    onSignInClick = { onEvent(SignUpEvent.OnNavigateToSignIn) }
-                )
-
-                Spacer(modifier = Modifier.height(48.dp))
             }
+
+            Spacer(Modifier.height(48.dp))
         }
     }
 }
 
 @Composable
-private fun NothingRegisterGlyphMark() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+private fun BrandMark() {
+    Box(
+        Modifier
+            .size(72.dp)
+            .drawBehind {
+                drawRoundRect(
+                    color = Color(0x38000000),
+                    topLeft = Offset(0f, 6.dp.toPx()),
+                    cornerRadius = CornerRadius(72.dp.toPx())
+                )
+            }
+            .background(HeavyLiftsColors.Accent, CircleShape),
+        contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier
-                .size(5.dp)
-                .background(NothingColors.FaintWhite, CircleShape)
-        )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(Modifier.size(5.dp).background(NothingColors.DimWhite, CircleShape))
-            Box(Modifier.size(10.dp).background(NothingColors.GlyphRed, CircleShape))
-            Box(Modifier.size(5.dp).background(NothingColors.DimWhite, CircleShape))
-        }
-        Box(
-            modifier = Modifier
-                .size(5.dp)
-                .background(NothingColors.FaintWhite, CircleShape)
-        )
-    }
-}
-
-@Composable
-private fun NothingRegisterHeading() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = "HEAVY LIFTS",
-            color = NothingColors.DimWhite,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 4.sp,
-            fontFamily = FontFamily.Monospace
-        )
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = "REGISTER",
-            color = NothingColors.NothingWhite,
-            fontWeight = FontWeight.Black,
-            fontSize = 30.sp,
-            letterSpacing = (-1).sp
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Box(
-            modifier = Modifier
-                .width(48.dp)
-                .height(2.dp)
-                .background(NothingColors.GlyphRed, RoundedCornerShape(1.dp))
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            text = "START TRACKING YOUR LIFTS",
-            color = NothingColors.FaintWhite,
-            fontSize = 8.sp,
-            letterSpacing = 2.sp,
-            fontFamily = FontFamily.Monospace,
+            text = "HL",
+            color = HeavyLiftsColors.Fg1,
+            fontFamily = HeavyLiftsType.Display,
+            fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
     }
 }
 
 @Composable
-private fun NothingInputField(
+private fun HLLabel(text: String) {
+    Text(
+        text = text,
+        color = HeavyLiftsColors.Fg3,
+        fontFamily = HeavyLiftsType.Display,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 4.dp, bottom = 6.dp)
+    )
+}
+
+@Composable
+private fun HLField(
     value: String,
     onValueChange: (String) -> Unit,
-    label: String,
+    placeholder: String,
     keyboardType: KeyboardType,
     imeAction: ImeAction,
-    modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)?
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier.fillMaxWidth(),
-        label = {
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = {
             Text(
-                text = label,
-                fontSize = 9.sp,
-                letterSpacing = 2.sp,
-                fontFamily = FontFamily.Monospace
+                placeholder,
+                color = HeavyLiftsColors.Fg4,
+                fontFamily = HeavyLiftsType.Body,
+                fontSize = 14.sp
             )
         },
         trailingIcon = trailingIcon,
         singleLine = true,
-        shape = RoundedCornerShape(3.dp),
+        shape = RoundedCornerShape(14.dp),
         visualTransformation = visualTransformation,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = keyboardType,
-            imeAction = imeAction
-        ),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor        = NothingColors.NothingWhite,
-            unfocusedTextColor      = NothingColors.NothingWhite,
-            focusedBorderColor      = NothingColors.NothingWhite,
-            unfocusedBorderColor    = NothingColors.Hairline,
-            focusedLabelColor       = NothingColors.DimWhite,
-            unfocusedLabelColor     = NothingColors.FaintWhite,
-            cursorColor             = NothingColors.GlyphRed,
-            focusedContainerColor   = NothingColors.Surface0,
-            unfocusedContainerColor = NothingColors.Surface0,
+            focusedTextColor = HeavyLiftsColors.Fg1,
+            unfocusedTextColor = HeavyLiftsColors.Fg2,
+            focusedBorderColor = HeavyLiftsColors.Accent,
+            unfocusedBorderColor = HeavyLiftsColors.BorderSubtle,
+            cursorColor = HeavyLiftsColors.Accent,
+            focusedContainerColor = HeavyLiftsColors.BgElevated,
+            unfocusedContainerColor = HeavyLiftsColors.BgElevated
+        ),
+        textStyle = TextStyle(
+            fontFamily = HeavyLiftsType.Body,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = HeavyLiftsColors.Fg1
         )
     )
 }
 
 @Composable
-private fun NothingCreateAccountButton(
-    isLoading: Boolean,
-    onClick: () -> Unit
-) {
+private fun CreateAccountPill(isLoading: Boolean, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         enabled = !isLoading,
-        shape = RoundedCornerShape(3.dp),
+        shape = RoundedCornerShape(28.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor         = NothingColors.NothingWhite,
-            contentColor           = NothingColors.Void,
-            disabledContainerColor = NothingColors.Surface1,
-            disabledContentColor   = NothingColors.FaintWhite
+            containerColor = HeavyLiftsColors.Accent,
+            contentColor = HeavyLiftsColors.Fg1,
+            disabledContainerColor = HeavyLiftsColors.BgChip,
+            disabledContentColor = HeavyLiftsColors.Fg3
         ),
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation  = 0.dp,
-            pressedElevation  = 0.dp,
-            disabledElevation = 0.dp
+            defaultElevation = 0.dp, pressedElevation = 0.dp, disabledElevation = 0.dp
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(52.dp)
+            .drawBehind {
+                drawRoundRect(
+                    color = Color(0x38000000),
+                    topLeft = Offset(0f, 6.dp.toPx()),
+                    cornerRadius = CornerRadius(28.dp.toPx())
+                )
+            }
+            .height(56.dp)
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier.size(18.dp),
-                color = NothingColors.DimWhite,
-                strokeWidth = 1.5.dp
+                modifier = Modifier.size(20.dp),
+                color = HeavyLiftsColors.Fg1,
+                strokeWidth = 2.dp
             )
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(Modifier.width(10.dp))
             Text(
-                text = "CREATING ACCOUNT",
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 2.sp,
-                fontFamily = FontFamily.Monospace,
-                color = NothingColors.FaintWhite
+                text = "Creating account…",
+                fontFamily = HeavyLiftsType.Display,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold
             )
         } else {
             Text(
-                text = "CREATE ACCOUNT",
-                fontWeight = FontWeight.Black,
-                fontSize = 11.sp,
-                letterSpacing = 3.sp,
-                fontFamily = FontFamily.Monospace,
-                color = NothingColors.Void
-            )
-        }
-    }
-}
-
-@Composable
-private fun NothingSignInLink(onSignInClick: () -> Unit) {
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "HAVE AN ACCOUNT?",
-            color = NothingColors.FaintWhite,
-            fontSize = 9.sp,
-            letterSpacing = 2.sp,
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        TextButton(
-            onClick = onSignInClick,
-            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
-        ) {
-            Text(
-                text = "SIGN IN_",
-                color = NothingColors.NothingWhite,
-                fontSize = 9.sp,
-                letterSpacing = 2.sp,
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.Black
+                text = "Create account",
+                fontFamily = HeavyLiftsType.Display,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }

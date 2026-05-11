@@ -27,22 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-object OnboardingColors {
-    val Void         = Color(0xFF0A0A0A)
-    val Surface0     = Color(0xFF111111)
-    val Surface1     = Color(0xFF1A1A1A)
-    val Surface2     = Color(0xFF222222)
-    val Hairline     = Color(0xFF2C2C2C)
-    val NothingWhite = Color(0xFFFFFFFF)
-    val OffWhite     = Color(0xFFE8E8E8)
-    val DimWhite     = Color(0xFF8A8A8A)
-    val FaintWhite   = Color(0xFF3A3A3A)
-    val GlyphRed     = Color(0xFFFF3A3A)
-}
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsColors
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsType
 
 fun Modifier.dotMatrix(
-    dotColor: Color = OnboardingColors.FaintWhite.copy(alpha = 0.14f),
+    dotColor: Color = HeavyLiftsColors.BgChip.copy(alpha = 0.14f),
     spacing: Float = 16f,
     radius: Float = 1.1f
 ): Modifier = this.drawBehind {
@@ -65,9 +54,9 @@ fun OnboardingStepProgress(current: Int, total: Int = 3) {
                     .width(if (i == current) 28.dp else 8.dp)
                     .background(
                         color = when {
-                            i == current -> OnboardingColors.GlyphRed
-                            i < current  -> OnboardingColors.DimWhite
-                            else         -> OnboardingColors.FaintWhite
+                            i == current -> HeavyLiftsColors.Accent
+                            i < current  -> HeavyLiftsColors.Fg3
+                            else         -> HeavyLiftsColors.BgChip
                         },
                         shape = RoundedCornerShape(1.dp)
                     )
@@ -92,8 +81,8 @@ fun OnboardingTextField(
         placeholder = {
             Text(
                 placeholder,
-                color = OnboardingColors.FaintWhite,
-                fontFamily = FontFamily.Monospace,
+                color = HeavyLiftsColors.BgChip,
+                fontFamily = HeavyLiftsType.Body,
                 fontSize = 13.sp
             )
         },
@@ -102,9 +91,9 @@ fun OnboardingTextField(
             {
                 Text(
                     it,
-                    color = OnboardingColors.GlyphRed,
+                    color = HeavyLiftsColors.Accent,
                     fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace
+                    fontFamily = HeavyLiftsType.Body
                 )
             }
         },
@@ -113,16 +102,16 @@ fun OnboardingTextField(
         singleLine = true,
         modifier = modifier,
         textStyle = TextStyle(
-            fontFamily = FontFamily.Monospace,
+            fontFamily = HeavyLiftsType.Body,
             fontSize = 13.sp
         ),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = OnboardingColors.NothingWhite,
-            unfocusedTextColor = OnboardingColors.OffWhite,
-            focusedBorderColor = OnboardingColors.NothingWhite,
-            unfocusedBorderColor = OnboardingColors.Hairline,
-            cursorColor = OnboardingColors.NothingWhite,
-            errorBorderColor = OnboardingColors.GlyphRed,
+            focusedTextColor = HeavyLiftsColors.Fg1,
+            unfocusedTextColor = HeavyLiftsColors.Fg2,
+            focusedBorderColor = HeavyLiftsColors.Fg1,
+            unfocusedBorderColor = HeavyLiftsColors.BorderSubtle,
+            cursorColor = HeavyLiftsColors.Fg1,
+            errorBorderColor = HeavyLiftsColors.Accent,
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent,
             errorContainerColor = Color.Transparent
@@ -138,8 +127,8 @@ fun OnboardingUnitToggle(
 ) {
     Row(
         modifier = Modifier
-            .background(OnboardingColors.Surface1, RoundedCornerShape(3.dp))
-            .border(1.dp, OnboardingColors.Hairline, RoundedCornerShape(3.dp))
+            .background(HeavyLiftsColors.BgChip, RoundedCornerShape(12.dp))
+            .border(1.dp, HeavyLiftsColors.BorderSubtle, RoundedCornerShape(12.dp))
             .padding(top = 8.dp)
     ) {
         options.forEachIndexed { index, label ->
@@ -148,17 +137,17 @@ fun OnboardingUnitToggle(
                 modifier = Modifier
                     .clickable { onSelect(index) }
                     .background(
-                        if (isSelected) OnboardingColors.NothingWhite else Color.Transparent
+                        if (isSelected) HeavyLiftsColors.Fg1 else Color.Transparent
                     )
                     .padding(horizontal = 12.dp, vertical = 10.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = label,
-                    color = if (isSelected) OnboardingColors.Void else OnboardingColors.DimWhite,
+                    color = if (isSelected) HeavyLiftsColors.Bg else HeavyLiftsColors.Fg3,
                     fontSize = 11.sp,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    fontFamily = FontFamily.Monospace
+                    fontFamily = HeavyLiftsType.Body
                 )
             }
         }
@@ -169,11 +158,11 @@ fun OnboardingUnitToggle(
 fun OnboardingSectionLabel(text: String) {
     Text(
         text = text,
-        color = OnboardingColors.DimWhite,
+        color = HeavyLiftsColors.Fg3,
         fontSize = 9.sp,
         fontWeight = FontWeight.Bold,
         letterSpacing = 3.sp,
-        fontFamily = FontFamily.Monospace
+        fontFamily = HeavyLiftsType.Body
     )
     Spacer(Modifier.height(8.dp))
 }

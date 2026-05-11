@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /tmp/design)",
+      "Read(//tmp/**)",
+      "Bash(tar -xzf \"C:\\\\Users\\\\qwert\\\\.claude\\\\projects\\\\C--Users-qwert-AndroidStudioProjects-HeavyLifts\\\\9e717340-eab1-4b71-b7f2-0b6bcb681d85\\\\tool-results\\\\webfetch-1777224211471-txqht3.bin\")",
+      "Bash(./gradlew compileDebugKotlin --no-daemon -q)"
+    ]
+  }
+}

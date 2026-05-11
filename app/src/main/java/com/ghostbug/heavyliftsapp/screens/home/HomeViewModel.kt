@@ -8,6 +8,8 @@ import com.ghostbug.heavyliftsapp.data.repository.DailyActivityRepository
 import com.ghostbug.heavyliftsapp.data.repository.OneRepMaxRepository
 import com.ghostbug.heavyliftsapp.data.repository.WorkoutRepository
 import com.ghostbug.heavyliftsapp.screens.home.HomeUiEvent.*
+import com.ghostbug.heavyliftsapp.supabase
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -51,6 +53,7 @@ class HomeViewModel(
                 _state.value.selectedDateMillis?.let { observeWorkoutsForDate(it) }
             }
         }
+
     }
 
     fun onEvent(event: HomeEvent) {

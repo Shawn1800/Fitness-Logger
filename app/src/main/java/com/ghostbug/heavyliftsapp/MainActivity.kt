@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.launch
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 
 import com.ghostbug.heavyliftsapp.ui.theme.Demo103Theme
@@ -35,11 +36,12 @@ class MainActivity : ComponentActivity() {
     private var onResetPasswordLinkReceived: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
-
         handleAuthLink(intent)
+
         setContent {
             Demo103Theme {
                 MainNavigation()
@@ -59,8 +61,6 @@ class MainActivity : ComponentActivity() {
             onResetPasswordLinkReceived?.invoke()
         }
     }
-
-
 }
 
 

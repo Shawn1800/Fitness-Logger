@@ -68,25 +68,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-
-// ─── Nothing OS Color Palette ─────────────────────────────────────────────────
-
-private object NothingColors {
-    val Void         = Color(0xFF0A0A0A)
-    val Surface0     = Color(0xFF111111)
-    val Surface1     = Color(0xFF1A1A1A)
-    val Surface2     = Color(0xFF222222)
-    val Hairline     = Color(0xFF2C2C2C)
-    val StrokeWeak   = Color(0xFF1E1E1E)
-    val NothingWhite = Color(0xFFFFFFFF)
-    val OffWhite     = Color(0xFFE8E8E8)
-    val DimWhite     = Color(0xFF8A8A8A)
-    val FaintWhite   = Color(0xFF3A3A3A)
-    val GlyphRed     = Color(0xFFFF3A3A)
-    val GlyphRedDim  = Color(0xFF3A1010)
-    val Positive     = Color(0xFFE8E8E8)
-    val Negative     = Color(0xFF666666)
-}
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsColors
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsType
 
 // ─── Nothing OS Screen ────────────────────────────────────────────────────────
 
@@ -127,47 +110,32 @@ fun StepTrackerScreen(
     }
 
     Scaffold(
-        containerColor = NothingColors.Void,
+        containerColor = HeavyLiftsColors.Bg,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = NothingColors.Void,
-                    titleContentColor = NothingColors.NothingWhite,
-                    actionIconContentColor = NothingColors.DimWhite
+                    containerColor = HeavyLiftsColors.Bg,
+                    titleContentColor = HeavyLiftsColors.Fg1,
+                    actionIconContentColor = HeavyLiftsColors.Fg3
                 ),
                 title = {
-                    Row(verticalAlignment = Alignment.Bottom) {
-                        Text(
-                            text = "step",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = NothingColors.NothingWhite,
-                            letterSpacing = (-0.5).sp
-                        )
-                        Text(
-                            text = ".",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = NothingColors.GlyphRed,
-                            letterSpacing = (-0.5).sp
-                        )
-                        Text(
-                            text = "tracker",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = NothingColors.NothingWhite,
-                            letterSpacing = (-0.5).sp
-                        )
-                    }
+                    Text(
+                        text = "Step tracker",
+                        fontFamily = HeavyLiftsType.Display,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = HeavyLiftsColors.Fg1,
+                        letterSpacing = (-0.25).sp
+                    )
                 },
                 actions = {
                     // Nothing-style edit button: circular, bordered
                     Box(
                         modifier = Modifier
                             .size(36.dp)
-                            .background(NothingColors.Surface1, CircleShape)
-                            .border(1.dp, NothingColors.Hairline, CircleShape),
+                            .background(HeavyLiftsColors.BgChip, CircleShape)
+                            .border(1.dp, HeavyLiftsColors.BorderSubtle, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         IconButton(
@@ -177,7 +145,7 @@ fun StepTrackerScreen(
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = "Edit goal",
-                                tint = NothingColors.DimWhite,
+                                tint = HeavyLiftsColors.Fg3,
                                 modifier = Modifier.size(15.dp)
                             )
                         }
@@ -194,7 +162,7 @@ fun StepTrackerScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(NothingColors.Void)
+                .background(HeavyLiftsColors.Bg)
         ) {
             if (state.isLoading) {
                 Box(
@@ -202,8 +170,8 @@ fun StepTrackerScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(
-                        color = NothingColors.GlyphRed,
-                        trackColor = NothingColors.FaintWhite,
+                        color = HeavyLiftsColors.Accent,
+                        trackColor = HeavyLiftsColors.BgChip,
                         strokeWidth = 2.dp
                     )
                 }
@@ -249,7 +217,7 @@ fun StepTrackerScreen(
         ModalBottomSheet(
             onDismissRequest = { viewModel.onEvent(StepTrackerEvent.CloseGoalEditor) },
             sheetState = bottomSheetState,
-            containerColor = NothingColors.Surface0,
+            containerColor = HeavyLiftsColors.BgElevated,
             dragHandle = {
                 // Nothing-style drag handle: short, muted
                 Box(
@@ -257,7 +225,7 @@ fun StepTrackerScreen(
                         .padding(top = 16.dp, bottom = 4.dp)
                         .width(36.dp)
                         .height(3.dp)
-                        .background(NothingColors.FaintWhite, RoundedCornerShape(99.dp))
+                        .background(HeavyLiftsColors.BgChip, RoundedCornerShape(99.dp))
                 )
             },
             shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
@@ -288,8 +256,8 @@ private fun StepRingCard(
     stepSource: String,
     calorieSource: String
 ) {
-    val glyphRed   = NothingColors.GlyphRed
-    val trackColor = NothingColors.FaintWhite
+    val glyphRed   = HeavyLiftsColors.Accent
+    val trackColor = HeavyLiftsColors.BgChip
 
     NothingCard {
         Row(
@@ -335,14 +303,14 @@ private fun StepRingCard(
                         text       = "%,d".format(steps),
                         fontSize   = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color      = NothingColors.NothingWhite,
+                        color      = HeavyLiftsColors.Fg1,
                         letterSpacing = (-1).sp,
                         lineHeight = 24.sp
                     )
                     Text(
                         text     = "steps today",
                         fontSize = 10.sp,
-                        color    = NothingColors.DimWhite,
+                        color    = HeavyLiftsColors.Fg3,
                         letterSpacing = 0.04.sp
                     )
                     Spacer(Modifier.height(3.dp))
@@ -350,7 +318,7 @@ private fun StepRingCard(
                         text       = "${(stepProgress * 100).toInt()}%",
                         fontSize   = 13.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color      = NothingColors.GlyphRed
+                        color      = HeavyLiftsColors.Accent
                     )
                 }
             }
@@ -363,7 +331,7 @@ private fun StepRingCard(
                 Text(
                     text  = "Goal: %,d steps".format(stepGoal),
                     fontSize = 12.sp,
-                    color = NothingColors.DimWhite
+                    color = HeavyLiftsColors.Fg3
                 )
 
                 NothingMiniStat(label = "CALORIES", value = "${calories.toInt()} kcal")
@@ -382,14 +350,14 @@ private fun NothingMiniStat(label: String, value: String) {
             text          = label,
             fontSize      = 10.sp,
             fontWeight    = FontWeight.Medium,
-            color         = NothingColors.Negative,
+            color         = HeavyLiftsColors.Fg4,
             letterSpacing = 0.08.sp
         )
         Text(
             text       = value,
             fontSize   = 15.sp,
             fontWeight = FontWeight.SemiBold,
-            color      = NothingColors.OffWhite
+            color      = HeavyLiftsColors.Fg2
         )
     }
 }
@@ -415,7 +383,7 @@ private fun StatsRow(
             unit          = "kcal",
             subLabel      = "of ${calorieGoal.toInt()} kcal",
             progress      = calorieProgress,
-            progressColor = NothingColors.NothingWhite,
+            progressColor = HeavyLiftsColors.Fg1,
             badge         = calorieSource
         )
         StatCard(
@@ -451,7 +419,7 @@ private fun StatCard(
                 text          = label,
                 fontSize      = 10.sp,
                 fontWeight    = FontWeight.Medium,
-                color         = NothingColors.Negative,
+                color         = HeavyLiftsColors.Fg4,
                 letterSpacing = 0.1.sp
             )
             Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -459,14 +427,14 @@ private fun StatCard(
                     text          = value,
                     fontSize      = 26.sp,
                     fontWeight    = FontWeight.Bold,
-                    color         = NothingColors.NothingWhite,
+                    color         = HeavyLiftsColors.Fg1,
                     letterSpacing = (-0.5).sp,
                     lineHeight    = 26.sp
                 )
                 Text(
                     text     = unit,
                     fontSize = 13.sp,
-                    color    = NothingColors.DimWhite,
+                    color    = HeavyLiftsColors.Fg3,
                     modifier = Modifier.padding(bottom = 3.dp)
                 )
             }
@@ -474,7 +442,7 @@ private fun StatCard(
                 Text(
                     text     = subLabel,
                     fontSize = 11.sp,
-                    color    = NothingColors.DimWhite
+                    color    = HeavyLiftsColors.Fg3
                 )
             }
             if (progress != null) {
@@ -512,10 +480,10 @@ private fun WeeklyBarChart(
     val daysHitGoal  = days.count { it.steps >= stepGoal }
     val hitGoal      = daysHitGoal > 0
 
-    val barColor      = NothingColors.GlyphRed
-    val dimBarColor   = NothingColors.GlyphRed.copy(alpha = 0.35f)
-    val gridColor     = NothingColors.Hairline
-    val goalDashColor = NothingColors.GlyphRed.copy(alpha = 0.55f)
+    val barColor      = HeavyLiftsColors.Accent
+    val dimBarColor   = HeavyLiftsColors.Accent.copy(alpha = 0.35f)
+    val gridColor     = HeavyLiftsColors.BorderSubtle
+    val goalDashColor = HeavyLiftsColors.Accent.copy(alpha = 0.55f)
 
     NothingCard {
         Column(modifier = Modifier.padding(20.dp)) {
@@ -531,25 +499,25 @@ private fun WeeklyBarChart(
                         text          = "weekly activity",
                         fontSize      = 14.sp,
                         fontWeight    = FontWeight.SemiBold,
-                        color         = NothingColors.NothingWhite,
+                        color         = HeavyLiftsColors.Fg1,
                         letterSpacing = (-0.3).sp
                     )
                     Text(
                         text          = "last 7 days",
                         fontSize      = 10.sp,
-                        color         = NothingColors.DimWhite,
+                        color         = HeavyLiftsColors.Fg3,
                         letterSpacing = 0.3.sp
                     )
                 }
                 Row(
                     modifier = Modifier
                         .background(
-                            if (hitGoal) NothingColors.GlyphRedDim else NothingColors.Surface2,
+                            if (hitGoal) HeavyLiftsColors.AccentSoft else HeavyLiftsColors.BgOverlay,
                             RoundedCornerShape(99.dp)
                         )
                         .border(
                             1.dp,
-                            if (hitGoal) NothingColors.GlyphRed.copy(alpha = 0.3f) else NothingColors.Hairline,
+                            if (hitGoal) HeavyLiftsColors.Accent.copy(alpha = 0.3f) else HeavyLiftsColors.BorderSubtle,
                             RoundedCornerShape(99.dp)
                         )
                         .padding(horizontal = 10.dp, vertical = 5.dp),
@@ -560,7 +528,7 @@ private fun WeeklyBarChart(
                         modifier = Modifier
                             .size(5.dp)
                             .background(
-                                if (hitGoal) NothingColors.GlyphRed else NothingColors.DimWhite,
+                                if (hitGoal) HeavyLiftsColors.Accent else HeavyLiftsColors.Fg3,
                                 CircleShape
                             )
                     )
@@ -568,7 +536,7 @@ private fun WeeklyBarChart(
                         text          = "$daysHitGoal/7 goals",
                         fontSize      = 10.sp,
                         fontWeight    = FontWeight.SemiBold,
-                        color         = if (hitGoal) NothingColors.GlyphRed else NothingColors.DimWhite,
+                        color         = if (hitGoal) HeavyLiftsColors.Accent else HeavyLiftsColors.Fg3,
                         letterSpacing = 0.05.sp,
                         fontFamily    = FontFamily.Monospace
                     )
@@ -592,8 +560,8 @@ private fun WeeklyBarChart(
                         Text(
                             text      = barChartCompactSteps(v.toInt()),
                             fontSize  = 8.sp,
-                            color     = NothingColors.DimWhite,
-                            fontFamily = FontFamily.Monospace,
+                            color     = HeavyLiftsColors.Fg3,
+                            fontFamily = HeavyLiftsType.Body,
                             textAlign = TextAlign.End,
                             modifier  = Modifier.fillMaxWidth()
                         )
@@ -621,8 +589,8 @@ private fun WeeklyBarChart(
                                     Text(
                                         text       = barChartCompactSteps(activity.steps),
                                         fontSize   = 7.sp,
-                                        color      = if (isToday) NothingColors.NothingWhite else NothingColors.DimWhite,
-                                        fontFamily = FontFamily.Monospace,
+                                        color      = if (isToday) HeavyLiftsColors.Fg1 else HeavyLiftsColors.Fg3,
+                                        fontFamily = HeavyLiftsType.Body,
                                         fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
                                         textAlign  = TextAlign.Center
                                     )
@@ -688,7 +656,7 @@ private fun WeeklyBarChart(
                                     ) {
                                         val corner = CornerRadius(4.dp.toPx())
                                         drawRoundRect(
-                                            color        = NothingColors.FaintWhite,
+                                            color        = HeavyLiftsColors.BgChip,
                                             size         = Size(size.width, size.height),
                                             cornerRadius = corner
                                         )
@@ -727,8 +695,8 @@ private fun WeeklyBarChart(
                                         .replaceFirstChar { it.uppercase() },
                                     fontSize   = 8.sp,
                                     fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
-                                    color      = if (isToday) NothingColors.GlyphRed else NothingColors.DimWhite,
-                                    fontFamily = FontFamily.Monospace,
+                                    color      = if (isToday) HeavyLiftsColors.Accent else HeavyLiftsColors.Fg3,
+                                    fontFamily = HeavyLiftsType.Body,
                                     textAlign  = TextAlign.Center
                                 )
                             }
@@ -760,14 +728,14 @@ private fun WeeklyBarChart(
                 Text(
                     text      = "goal · %,d steps".format(stepGoal),
                     fontSize  = 9.sp,
-                    color     = NothingColors.DimWhite,
-                    fontFamily = FontFamily.Monospace
+                    color     = HeavyLiftsColors.Fg3,
+                    fontFamily = HeavyLiftsType.Body
                 )
             }
 
             Spacer(Modifier.height(12.dp))
 
-            Box(Modifier.fillMaxWidth().height(1.dp).background(NothingColors.Hairline))
+            Box(Modifier.fillMaxWidth().height(1.dp).background(HeavyLiftsColors.BorderSubtle))
 
             Spacer(Modifier.height(12.dp))
 
@@ -796,7 +764,7 @@ private fun BarChartFooterStat(label: String, value: String) {
         Text(
             text          = label,
             fontSize      = 8.sp,
-            color         = NothingColors.DimWhite,
+            color         = HeavyLiftsColors.Fg3,
             letterSpacing = 1.sp,
             fontFamily    = FontFamily.Monospace
         )
@@ -804,8 +772,8 @@ private fun BarChartFooterStat(label: String, value: String) {
             text       = value,
             fontSize   = 13.sp,
             fontWeight = FontWeight.Bold,
-            color      = NothingColors.OffWhite,
-            fontFamily = FontFamily.Monospace
+            color      = HeavyLiftsColors.Fg2,
+            fontFamily = HeavyLiftsType.Body
         )
     }
 }
@@ -835,20 +803,20 @@ private fun GoalEditorSheet(
                 text       = "set daily goals",
                 fontSize   = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color      = NothingColors.NothingWhite,
+                color      = HeavyLiftsColors.Fg1,
                 letterSpacing = (-0.5).sp
             )
             Text(
                 text       = ".",
                 fontSize   = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color      = NothingColors.GlyphRed
+                color      = HeavyLiftsColors.Accent
             )
         }
         Text(
             text     = "Customize your targets",
             fontSize = 12.sp,
-            color    = NothingColors.Negative
+            color    = HeavyLiftsColors.Fg4
         )
 
         NothingTextField(
@@ -877,9 +845,9 @@ private fun GoalEditorSheet(
                     .weight(1f)
                     .height(52.dp),
                 shape    = RoundedCornerShape(14.dp),
-                border   = androidx.compose.foundation.BorderStroke(1.dp, NothingColors.Hairline),
+                border   = androidx.compose.foundation.BorderStroke(1.dp, HeavyLiftsColors.BorderSubtle),
                 colors   = outlinedButtonColors(
-                    contentColor = NothingColors.DimWhite
+                    contentColor = HeavyLiftsColors.Fg3
                 )
             ) {
                 Text(
@@ -897,17 +865,17 @@ private fun GoalEditorSheet(
                     .height(52.dp),
                 shape    = RoundedCornerShape(14.dp),
                 colors   = ButtonDefaults.buttonColors(
-                    containerColor = NothingColors.GlyphRed,
-                    contentColor   = NothingColors.Void,
-                    disabledContainerColor = NothingColors.GlyphRedDim,
-                    disabledContentColor   = NothingColors.DimWhite
+                    containerColor = HeavyLiftsColors.Accent,
+                    contentColor   = HeavyLiftsColors.Bg,
+                    disabledContainerColor = HeavyLiftsColors.AccentSoft,
+                    disabledContentColor   = HeavyLiftsColors.Fg3
                 )
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier  = Modifier.size(18.dp),
-                        color     = NothingColors.Void,
-                        trackColor = NothingColors.GlyphRedDim,
+                        color     = HeavyLiftsColors.Bg,
+                        trackColor = HeavyLiftsColors.AccentSoft,
                         strokeWidth = 2.dp
                     )
                 } else {
@@ -936,9 +904,9 @@ private fun NothingCard(
     Card(
         modifier  = modifier.fillMaxWidth(),
         shape     = RoundedCornerShape(24.dp),
-        colors    = CardDefaults.cardColors(containerColor = NothingColors.Surface0),
+        colors    = CardDefaults.cardColors(containerColor = HeavyLiftsColors.BgElevated),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border    = androidx.compose.foundation.BorderStroke(1.dp, NothingColors.Hairline)
+        border    = androidx.compose.foundation.BorderStroke(1.dp, HeavyLiftsColors.BorderSubtle)
     ) {
         content()
     }
@@ -969,14 +937,14 @@ private fun NothingTextField(
         placeholder   = {
             Text(
                 text     = placeholder,
-                color    = NothingColors.Negative,
+                color    = HeavyLiftsColors.Fg4,
                 fontSize = 15.sp
             )
         },
         supportingText = {
             Text(
                 text     = supporting,
-                color    = NothingColors.Negative,
+                color    = HeavyLiftsColors.Fg4,
                 fontSize = 11.sp
             )
         },
@@ -985,19 +953,19 @@ private fun NothingTextField(
         singleLine      = true,
         shape           = RoundedCornerShape(14.dp),
         textStyle       = TextStyle(
-            color      = NothingColors.NothingWhite,
+            color      = HeavyLiftsColors.Fg1,
             fontSize   = 16.sp,
             fontWeight = FontWeight.Medium
         ),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor       = NothingColors.GlyphRed,
-            unfocusedBorderColor     = NothingColors.Hairline,
-            focusedLabelColor        = NothingColors.GlyphRed,
-            unfocusedLabelColor      = NothingColors.Negative,
-            cursorColor              = NothingColors.GlyphRed,
-            focusedContainerColor    = NothingColors.Surface1,
-            unfocusedContainerColor  = NothingColors.Surface1,
-            disabledContainerColor   = NothingColors.Surface1
+            focusedBorderColor       = HeavyLiftsColors.Accent,
+            unfocusedBorderColor     = HeavyLiftsColors.BorderSubtle,
+            focusedLabelColor        = HeavyLiftsColors.Accent,
+            unfocusedLabelColor      = HeavyLiftsColors.Fg4,
+            cursorColor              = HeavyLiftsColors.Accent,
+            focusedContainerColor    = HeavyLiftsColors.BgChip,
+            unfocusedContainerColor  = HeavyLiftsColors.BgChip,
+            disabledContainerColor   = HeavyLiftsColors.BgChip
         )
     )
 }
@@ -1007,20 +975,20 @@ private fun NothingTextField(
 @Composable
 private fun SourceBadge(source: String) {
     val (label, dotColor) = when (source) {
-        "health_connect" -> "HEALTH CONNECT" to NothingColors.GlyphRed
-        "sensor"         -> "PHONE SENSOR"   to NothingColors.OffWhite
-        else             -> "ESTIMATED"      to NothingColors.Negative
+        "health_connect" -> "HEALTH CONNECT" to HeavyLiftsColors.Accent
+        "sensor"         -> "PHONE SENSOR"   to HeavyLiftsColors.Fg2
+        else             -> "ESTIMATED"      to HeavyLiftsColors.Fg4
     }
 
     val badgeBg = when (source) {
-        "health_connect" -> NothingColors.GlyphRedDim
-        "sensor"         -> NothingColors.Surface2
-        else             -> NothingColors.Surface2
+        "health_connect" -> HeavyLiftsColors.AccentSoft
+        "sensor"         -> HeavyLiftsColors.BgOverlay
+        else             -> HeavyLiftsColors.BgOverlay
     }
 
     val borderColor = when (source) {
-        "health_connect" -> NothingColors.GlyphRed.copy(alpha = 0.25f)
-        else             -> NothingColors.Hairline
+        "health_connect" -> HeavyLiftsColors.Accent.copy(alpha = 0.25f)
+        else             -> HeavyLiftsColors.BorderSubtle
     }
 
     Row(
@@ -1040,7 +1008,7 @@ private fun SourceBadge(source: String) {
             text          = label,
             fontSize      = 10.sp,
             fontWeight    = FontWeight.SemiBold,
-            color         = if (source == "health_connect") NothingColors.GlyphRed else NothingColors.DimWhite,
+            color         = if (source == "health_connect") HeavyLiftsColors.Accent else HeavyLiftsColors.Fg3,
             letterSpacing = 0.06.sp
         )
     }
@@ -1054,7 +1022,7 @@ private fun NothingLinearProgressBar(
     color: Color,
     modifier: Modifier = Modifier
 ) {
-    val trackColor = NothingColors.FaintWhite
+    val trackColor = HeavyLiftsColors.BgChip
     Canvas(
         modifier = modifier
             .fillMaxWidth()

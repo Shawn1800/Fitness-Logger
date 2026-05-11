@@ -9,22 +9,26 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.jan.supabase.auth.auth
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.ghostbug.heavyliftsapp.data.health.HealthConnectAvailability
 import com.ghostbug.heavyliftsapp.di.HeavyLifts
-import com.ghostbug.heavyliftsapp.screens.Profile.ProfileViewModelFactory
+import com.ghostbug.heavyliftsapp.screens.profile.ProfileViewModelFactory
 import com.ghostbug.heavyliftsapp.screens.exercise_selection.ExerciseSelectionScreen
 import com.ghostbug.heavyliftsapp.screens.exercise_selection.ExerciseViewModel
 import com.ghostbug.heavyliftsapp.screens.exercise_selection.ExerciseViewModelFactory
@@ -34,8 +38,12 @@ import com.ghostbug.heavyliftsapp.screens.home.HomeViewModelFactory
 import com.ghostbug.heavyliftsapp.screens.log_workout.LogWorkoutScreen
 import com.ghostbug.heavyliftsapp.screens.log_workout.LogWorkoutViewModel
 import com.ghostbug.heavyliftsapp.screens.log_workout.LogWorkoutViewModelFactory
+import com.ghostbug.heavyliftsapp.screens.leaderboard.LeaderboardScreen
 import com.ghostbug.heavyliftsapp.screens.profile.ProfileScreen
 import com.ghostbug.heavyliftsapp.screens.profile.ProfileViewModel
+import com.ghostbug.heavyliftsapp.screens.root.AuthGate
+import com.ghostbug.heavyliftsapp.screens.root.RootViewModel
+import com.ghostbug.heavyliftsapp.screens.root.RootViewModelFactory
 import com.ghostbug.heavyliftsapp.screens.signIn.SignInScreen
 import com.ghostbug.heavyliftsapp.screens.signIn.SignInViewModel
 import com.ghostbug.heavyliftsapp.screens.signIn.SignInViewModelFactory
@@ -59,8 +67,10 @@ fun MainNavigation(
     val app = context.applicationContext as HeavyLifts
     val container = app.appContainer
 
-
-
+    val rootViewModel: RootViewModel = viewModel(
+        factory = RootViewModelFactory(container.supabase.auth, container.userProfileRepository)
+    )
+    val gate by rootViewModel.gate.collectAsStateWithLifecycle()
 
     val homeViewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(
@@ -135,8 +145,38 @@ fun MainNavigation(
         topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
     )
 
-    val navigator = remember {
+    val navigator = remember(navigationState) {
         Navigator(navigationState)
+    }
+
+    if (gate is AuthGate.Loading) {
+        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
+    var initialGateApplied by remember { mutableStateOf(false) }
+    LaunchedEffect(gate) {
+        if (initialGateApplied) return@LaunchedEffect
+        val current = navigationState.currentRoute
+        val onAuthScreen = current is Route.SignInScreen || current is Route.SignUpScreen
+        val onOnboarding = current is Route.UserProfileScreen1 ||
+                current is Route.UserProfileScreen2 ||
+                current is Route.UserProfileScreen3
+        when (gate) {
+            AuthGate.SignedOut -> if (!onAuthScreen) {
+                navigator.clearAll()
+                navigator.navigate(Route.SignInScreen)
+            }
+            AuthGate.NeedsOnboarding -> if (!onOnboarding) {
+                navigator.clearAll()
+                navigator.navigate(Route.UserProfileScreen1)
+            }
+            AuthGate.Ready -> { /* HomeScreen is already the start route */ }
+            AuthGate.Loading -> return@LaunchedEffect
+        }
+        initialGateApplied = true
     }
 
     val showBottomNav = navigationState.currentRoute.let { current ->
@@ -342,13 +382,7 @@ fun MainNavigation(
 
 
                     entry<Route.LeaderBoards> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("Coming Soon..")
-                        }
+                        LeaderboardScreen()
                     }
                 }
             )

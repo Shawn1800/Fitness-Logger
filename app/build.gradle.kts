@@ -27,8 +27,8 @@ extensions.configure<ApplicationExtension>  {
         applicationId = "com.ghostbug.heavyliftsapp"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
-        versionName = "1.0.4"
+        versionCode = 6
+        versionName = "1.0.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -91,6 +91,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation("androidx.compose.ui:ui-text-google-fonts")
 
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.navigation3.runtime)
@@ -114,9 +115,12 @@ dependencies {
 
         implementation("io.coil-kt:coil-compose:2.6.0")
 
+    implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.health.connect:connect-client:1.2.0-alpha03")
 
     implementation("com.google.android.gms:play-services-fitness:21.2.0")
     implementation("androidx.work:work-runtime-ktx:2.11.2")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.0")
+
 }
 

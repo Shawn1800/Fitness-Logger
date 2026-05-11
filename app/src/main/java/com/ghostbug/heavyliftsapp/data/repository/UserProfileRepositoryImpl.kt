@@ -73,6 +73,10 @@ class UserProfileRepositoryImpl(
         }
     }
 
+    override suspend fun isProfileComplete(): Boolean {
+        return getOwnProfile() != null
+    }
+
     override suspend fun isUserNameTaken(userName: String): Boolean {
         val uid = currentUserId ?: return false
         return withContext(Dispatchers.IO) {

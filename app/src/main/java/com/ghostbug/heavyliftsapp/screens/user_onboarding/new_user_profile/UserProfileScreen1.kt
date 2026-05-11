@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsColors
 
 @Composable
 fun UserProfileScreen1(
@@ -56,7 +57,7 @@ fun UserProfileScreen1(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(OnboardingColors.Void)
+            .background(HeavyLiftsColors.Bg)
             .dotMatrix()
     ) {
         SnackbarHost(
@@ -80,7 +81,7 @@ fun UserProfileScreen1(
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = OnboardingColors.DimWhite
+                        tint = HeavyLiftsColors.Fg3
                     )
                 }
                 Spacer(Modifier.weight(1f))
@@ -91,7 +92,7 @@ fun UserProfileScreen1(
 
             Text(
                 text = "CHOOSE YOUR\nHANDLE.",
-                color = OnboardingColors.NothingWhite,
+                color = HeavyLiftsColors.Fg1,
                 fontSize = 34.sp,
                 fontWeight = FontWeight.Black,
                 lineHeight = 38.sp,
@@ -103,7 +104,7 @@ fun UserProfileScreen1(
 
             Text(
                 text = "this is how others will find you.",
-                color = OnboardingColors.DimWhite,
+                color = HeavyLiftsColors.Fg3,
                 fontSize = 11.sp,
                 fontFamily = FontFamily.Monospace,
                 letterSpacing = 0.5.sp
@@ -124,18 +125,18 @@ fun UserProfileScreen1(
                         state.isLoading -> CircularProgressIndicator(
                             modifier = Modifier.size(18.dp),
                             strokeWidth = 2.dp,
-                            color = OnboardingColors.DimWhite
+                            color = HeavyLiftsColors.Fg3
                         )
                         state.userNameError != null -> Icon(
                             Icons.Default.Close,
                             contentDescription = null,
-                            tint = OnboardingColors.GlyphRed,
+                            tint = HeavyLiftsColors.Accent,
                             modifier = Modifier.size(18.dp)
                         )
                         state.userName.length in 3..20 && !state.isLoading -> Icon(
                             Icons.Default.Check,
                             contentDescription = null,
-                            tint = OnboardingColors.NothingWhite,
+                            tint = HeavyLiftsColors.Fg1,
                             modifier = Modifier.size(18.dp)
                         )
                         else -> {}
@@ -147,7 +148,7 @@ fun UserProfileScreen1(
                 Spacer(Modifier.height(6.dp))
                 Text(
                     text = "3–20 characters  ·  must be unique",
-                    color = OnboardingColors.FaintWhite,
+                    color = HeavyLiftsColors.BgChip,
                     fontSize = 10.sp,
                     fontFamily = FontFamily.Monospace,
                     letterSpacing = 0.3.sp
@@ -161,8 +162,8 @@ fun UserProfileScreen1(
                     .fillMaxWidth()
                     .height(52.dp)
                     .background(
-                        color = if (state.isLoading) OnboardingColors.Surface2
-                        else OnboardingColors.NothingWhite,
+                        color = if (state.isLoading) HeavyLiftsColors.BgOverlay
+                        else HeavyLiftsColors.Fg1,
                         shape = RoundedCornerShape(2.dp)
                     )
                     .clickable(enabled = !state.isLoading) {
@@ -174,12 +175,12 @@ fun UserProfileScreen1(
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
                         strokeWidth = 2.dp,
-                        color = OnboardingColors.DimWhite
+                        color = HeavyLiftsColors.Fg3
                     )
                 } else {
                     Text(
                         text = "CONTINUE",
-                        color = OnboardingColors.Void,
+                        color = HeavyLiftsColors.Bg,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 3.sp,

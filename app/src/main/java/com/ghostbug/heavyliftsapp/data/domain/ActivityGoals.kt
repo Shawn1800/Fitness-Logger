@@ -2,7 +2,6 @@ package com.ghostbug.heavyliftsapp.data.domain
 
 
 import kotlinx.datetime.LocalDate
-import kotlin.time.Clock.System.now
 import kotlin.time.Instant
 
 data class  ActivityGoals (

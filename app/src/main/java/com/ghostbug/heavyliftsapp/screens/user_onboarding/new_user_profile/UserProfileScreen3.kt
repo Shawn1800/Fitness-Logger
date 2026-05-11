@@ -43,8 +43,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.ghostbug.heavyliftsapp.screens.home.HomeEvent
-import com.ghostbug.heavyliftsapp.screens.user_onboarding.new_user_profile.OnboardingColors
 import com.ghostbug.heavyliftsapp.screens.user_onboarding.new_user_profile.OnboardingSectionLabel
+import com.ghostbug.heavyliftsapp.ui.theme.HeavyLiftsColors
 import com.ghostbug.heavyliftsapp.screens.user_onboarding.new_user_profile.OnboardingStepProgress
 import com.ghostbug.heavyliftsapp.screens.user_onboarding.new_user_profile.OnboardingTextField
 import com.ghostbug.heavyliftsapp.screens.user_onboarding.new_user_profile.UserProfileEvent
@@ -75,7 +75,7 @@ fun UserProfileScreen3(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(OnboardingColors.Void)
+            .background(HeavyLiftsColors.Bg)
             .dotMatrix()
     ) {
         SnackbarHost(
@@ -100,7 +100,7 @@ fun UserProfileScreen3(
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = OnboardingColors.DimWhite
+                        tint = HeavyLiftsColors.Fg3
                     )
                 }
                 Spacer(Modifier.weight(1f))
@@ -111,7 +111,7 @@ fun UserProfileScreen3(
 
             Text(
                 text = "FINAL\nDETAILS.",
-                color = OnboardingColors.NothingWhite,
+                color = HeavyLiftsColors.Fg1,
                 fontSize = 34.sp,
                 fontWeight = FontWeight.Black,
                 lineHeight = 38.sp,
@@ -123,7 +123,7 @@ fun UserProfileScreen3(
 
             Text(
                 text = "optional — but makes the experience yours.",
-                color = OnboardingColors.DimWhite,
+                color = HeavyLiftsColors.Fg3,
                 fontSize = 11.sp,
                 fontFamily = FontFamily.Monospace,
                 letterSpacing = 0.5.sp
@@ -143,7 +143,7 @@ fun UserProfileScreen3(
                         modifier = Modifier
                             .size(88.dp)
                             .clip(CircleShape)
-                            .border(1.dp, OnboardingColors.Hairline, CircleShape),
+                            .border(1.dp, HeavyLiftsColors.BorderSubtle, CircleShape),
                         contentScale = ContentScale.Crop
                     )
                 } else {
@@ -151,15 +151,15 @@ fun UserProfileScreen3(
                         modifier = Modifier
                             .size(88.dp)
                             .clip(CircleShape)
-                            .background(OnboardingColors.Surface1)
-                            .border(1.dp, OnboardingColors.Hairline, CircleShape),
+                            .background(HeavyLiftsColors.BgChip)
+                            .border(1.dp, HeavyLiftsColors.BorderSubtle, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Person,
                             contentDescription = null,
                             modifier = Modifier.size(44.dp),
-                            tint = OnboardingColors.FaintWhite
+                            tint = HeavyLiftsColors.BgChip
                         )
                     }
                 }
@@ -171,14 +171,14 @@ fun UserProfileScreen3(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(OnboardingColors.Surface1, RoundedCornerShape(4.dp))
-                    .border(1.dp, OnboardingColors.Hairline, RoundedCornerShape(4.dp))
+                    .background(HeavyLiftsColors.BgChip, RoundedCornerShape(4.dp))
+                    .border(1.dp, HeavyLiftsColors.BorderSubtle, RoundedCornerShape(4.dp))
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
                     text = "PROFILE SUMMARY",
-                    color = OnboardingColors.DimWhite,
+                    color = HeavyLiftsColors.Fg3,
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 3.sp,
@@ -189,7 +189,7 @@ fun UserProfileScreen3(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(1.dp)
-                        .background(OnboardingColors.Hairline)
+                        .background(HeavyLiftsColors.BorderSubtle)
                 )
 
                 SummaryRow("HANDLE", "@${state.userName}")
@@ -254,13 +254,13 @@ fun UserProfileScreen3(
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)
-                        .border(1.dp, OnboardingColors.Hairline, RoundedCornerShape(2.dp))
+                        .border(1.dp, HeavyLiftsColors.BorderSubtle, RoundedCornerShape(2.dp))
                         .clickable { onBack() },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "BACK",
-                        color = OnboardingColors.DimWhite,
+                        color = HeavyLiftsColors.Fg3,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 3.sp,
@@ -273,8 +273,8 @@ fun UserProfileScreen3(
                         .weight(1f)
                         .height(52.dp)
                         .background(
-                            color = if (state.isLoading) OnboardingColors.Surface2
-                            else OnboardingColors.GlyphRed,
+                            color = if (state.isLoading) HeavyLiftsColors.BgOverlay
+                            else HeavyLiftsColors.Accent,
                             shape = RoundedCornerShape(2.dp)
                         )
                         .clickable(enabled = !state.isLoading) {
@@ -286,12 +286,12 @@ fun UserProfileScreen3(
                         CircularProgressIndicator(
                             modifier = Modifier.size(20.dp),
                             strokeWidth = 2.dp,
-                            color = OnboardingColors.NothingWhite
+                            color = HeavyLiftsColors.Fg1
                         )
                     } else {
                         Text(
                             text = "LET'S GO.",
-                            color = OnboardingColors.NothingWhite,
+                            color = HeavyLiftsColors.Fg1,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Black,
                             letterSpacing = 3.sp,
@@ -315,7 +315,7 @@ private fun SummaryRow(label: String, value: String) {
     ) {
         Text(
             text = label,
-            color = OnboardingColors.DimWhite,
+            color = HeavyLiftsColors.Fg3,
             fontSize = 9.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 2.sp,
@@ -323,7 +323,7 @@ private fun SummaryRow(label: String, value: String) {
         )
         Text(
             text = value,
-            color = OnboardingColors.OffWhite,
+            color = HeavyLiftsColors.Fg2,
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             fontFamily = FontFamily.Monospace

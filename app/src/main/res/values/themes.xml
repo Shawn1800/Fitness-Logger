@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.Demo103" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.HeavyLifts.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/fire_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/fire_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.Demo103</item>
+    </style>
 </resources>

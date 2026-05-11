@@ -91,7 +91,7 @@ class AppContainer(private val context: Context) {
     }
 
     val authRepository: AuthRepository by lazy {
-        AuthRepositoryImpl(auth = supabase.auth)
+        AuthRepositoryImpl(auth = supabase.auth,supabase.postgrest)
     }
 
     val oneRepMaxUseCase: OneRepMaxUseCase by lazy {

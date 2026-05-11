@@ -5,9 +5,11 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.IDToken
+import io.github.jan.supabase.postgrest.Postgrest
 
 class AuthRepositoryImpl(
-    private val auth: Auth
+    private val auth: Auth,
+    val postgrest: Postgrest
 ) : AuthRepository {
 
     override suspend fun signIn(email: String, password: String): Boolean {
@@ -53,6 +55,7 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun deleteAccount() {
+        postgrest.rpc("delete_my_account")
         auth.signOut()
     }
 

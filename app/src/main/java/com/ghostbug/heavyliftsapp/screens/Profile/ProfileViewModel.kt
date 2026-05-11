@@ -294,7 +294,6 @@ class ProfileViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isDeleting = true, showDeleteDialog = false) }
             try {
-                userProfileRepository.deleteOwnProfile()
                 authRepository.deleteAccount()
                 _uiEvent.emit(ProfileUiEvent.AccountDeleted)
             } catch (_: Exception) {
