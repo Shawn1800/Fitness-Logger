@@ -92,4 +92,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 Join Playstore closed testing to download the the app .This app is still in alpha version
 
-[Cloed Test Link](https://kotlinlang.org/)
+[Cloed Test Link](https://play.google.com/apps/internaltest/4701532533483957856)
